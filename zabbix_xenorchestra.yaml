@@ -1,0 +1,404 @@
+zabbix_export:
+  version: '6.0'
+  date: '2023-12-26T14:08:25Z'
+  groups:
+    - uuid: 1b837a3c078647049a0c00c61b4d57b5
+      name: Hypervisors
+    - uuid: 7df96b18c230490a9a0a9e2307226338
+      name: Templates
+  templates:
+    - uuid: 8d4ad92902e6440ca14dfa5256d8bf82
+      template: 'XCP-NG Host via Xen Orchestra'
+      name: 'XCP-NG Host via Xen Orchestra'
+      groups:
+        - name: Templates
+      items:
+        - uuid: d137a2d23e554eb7b98d1de0ce26dfb6
+          name: 'CPU Cores'
+          type: DEPENDENT
+          key: xoa.host.cpu.cores
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.CPUs.cpu_count
+          master_item:
+            key: xoa.host.raw
+        - uuid: 0a1e66d4f0a4455abcfd9317c4c973b1
+          name: 'CPU Sockets'
+          type: DEPENDENT
+          key: xoa.host.cpu.sockets
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.CPUs.socket_count
+          master_item:
+            key: xoa.host.raw
+        - uuid: 702c08f7b6d94be49fbfaef45b1b4174
+          name: 'Host description'
+          type: DEPENDENT
+          key: xoa.host.description
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.name_description
+          master_item:
+            key: xoa.host.raw
+        - uuid: a6343812baea4750b24def6a3ef71f70
+          name: Enabled
+          type: DEPENDENT
+          key: xoa.host.enabled
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.enabled
+          master_item:
+            key: xoa.host.raw
+        - uuid: 604ae2b2e6b943c387edd492eddc8beb
+          name: 'Hypervisor brand'
+          type: DEPENDENT
+          key: xoa.host.hv.brand
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.productBrand
+          master_item:
+            key: xoa.host.raw
+        - uuid: 494f4ddea1cf40398641295be217878a
+          name: 'Hypervisor version'
+          type: DEPENDENT
+          key: xoa.host.hv.version
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.version
+          master_item:
+            key: xoa.host.raw
+        - uuid: c1c9cee844f34ff289b32559493af04f
+          name: 'Hypervisor version build'
+          type: DEPENDENT
+          key: xoa.host.hv.version.build
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.build
+          master_item:
+            key: xoa.host.raw
+        - uuid: ecf042cea23e45e89954fe6fc499be86
+          name: 'HVM capable'
+          type: DEPENDENT
+          key: xoa.host.hvm.capabale
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.hvmCapable
+          master_item:
+            key: xoa.host.raw
+        - uuid: 4026336d2d97475e9019522c73535574
+          name: 'Memory total'
+          type: DEPENDENT
+          key: xoa.host.memory.total
+          delay: '0'
+          units: B
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.memory.size
+          master_item:
+            key: xoa.host.raw
+        - uuid: 6181620d670c4e3cbeaad0babe89fc1b
+          name: 'Memory used'
+          type: DEPENDENT
+          key: xoa.host.memory.used
+          delay: '0'
+          units: B
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.memory.usage
+          master_item:
+            key: xoa.host.raw
+        - uuid: ed5fe0b877ed469ebc0d4e4b32ff8a87
+          name: 'Memory used percent'
+          type: CALCULATED
+          key: xoa.host.memory.used.percent
+          delay: 15m
+          value_type: FLOAT
+          units: '%'
+          params: 'last(//xoa.host.memory.used)/last(//xoa.host.memory.total)*100'
+        - uuid: 3725dfaac75643fcb3cfe0b852a26f70
+          name: Hostname
+          type: DEPENDENT
+          key: xoa.host.name
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.name_label
+          master_item:
+            key: xoa.host.raw
+        - uuid: 5b2435e1c5dd49c7be4b7cc1dc31e64d
+          name: 'Power State'
+          type: DEPENDENT
+          key: xoa.host.power.state
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.power_state
+          master_item:
+            key: xoa.host.raw
+        - uuid: 11c547b55c424e26bb02d87266980a6f
+          name: 'XCP-NG Hosts: Get Values'
+          type: HTTP_AGENT
+          key: xoa.host.raw
+          delay: 15m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
+        - uuid: ee2ab8db1e0f4d1f88df5fe6892eaf73
+          name: 'Reboot required'
+          type: DEPENDENT
+          key: xoa.host.reboot.required
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.rebootRequired
+          master_item:
+            key: xoa.host.raw
+        - uuid: 745f6fb406c34e3b8ec313a54b2c85cc
+          name: 'Host start time'
+          type: DEPENDENT
+          key: xoa.host.starttime
+          delay: '0'
+          units: unixtime
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.startTime
+          master_item:
+            key: xoa.host.raw
+      tags:
+        - tag: component
+          value: hypervisor
+        - tag: target
+          value: xcp-ng
+      macros:
+        - macro: '{$XOA.AUTH.TOKEN}'
+          value: CHANGE_IF_NEEDED
+          description: 'Authentication Token generated on XOA UI'
+        - macro: '{$XOA.HOST.UUID}'
+          value: CHANGE_IF_NEEDED
+          description: 'Host UUID'
+        - macro: '{$XOA.URL}'
+          value: CHANGE_IF_NEEDED
+          description: 'URL where XOA can be reached'
+      valuemaps:
+        - uuid: 7de0ad540b0f4fd5ab2b33ef9f79d440
+          name: 'XOA Boolean'
+          mappings:
+            - value: '1'
+              newvalue: 'true'
+            - value: '0'
+              newvalue: 'false'
+    - uuid: 5f69e71a0ed1418da4daf08e4dc22b7c
+      template: 'Xen Orchestra by HTTP'
+      name: 'Xen Orchestra by HTTP'
+      groups:
+        - name: Templates
+      discovery_rules:
+        - uuid: c7416b23bd7940109b07ef3d40f5a0f0
+          name: 'Discovery Hosts'
+          type: HTTP_AGENT
+          key: xoa.hosts.discovery
+          delay: 1h
+          lifetime: 1d
+          host_prototypes:
+            - uuid: c15f47a062bd4e71872ade31b581b9e1
+              host: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
+              name: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
+              group_links:
+                - group:
+                    name: Hypervisors
+              templates:
+                - name: 'XCP-NG Host via Xen Orchestra'
+              macros:
+                - macro: '{$XOA.HOST.UUID}'
+                  value: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
+                  description: 'Host UUID'
+              tags:
+                - tag: componenet
+                  value: Hypervisor
+                - tag: target
+                  value: xen
+          url: '{$XOA.URL}/rest/v0/hosts'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
+          lld_macro_paths:
+            - lld_macro: '{#HOSTS.URL}'
+              path: $.url
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  response = []
+                  for (v in JSON.parse(value)) {
+                  response.push({"url": JSON.parse(value)[v]})
+                  }
+                  
+                  return JSON.stringify(response)
+        - uuid: ba152d09c30a48fda5e2385615ebe76d
+          name: 'Discovery Pools'
+          type: HTTP_AGENT
+          key: xoa.pool.discovery
+          lifetime: 1d
+          item_prototypes:
+            - uuid: 7f4a8af6115b4128afb280c678bc4db9
+              name: 'Pool {#POOL.URL}: CPU Cores'
+              type: DEPENDENT
+              key: 'xoa.pool.cpu.cores[{#POOL.URL}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.cpus.cores
+              master_item:
+                key: 'xoa.pool[{#POOL.URL}]'
+            - uuid: f6d83eef5fd9449d97ac649bb0f6e40e
+              name: 'Pool {#POOL.URL}: CPU Sockets'
+              type: DEPENDENT
+              key: 'xoa.pool.cpu.sockets[{#POOL.URL}]'
+              delay: '0'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.cpus.sockets
+              master_item:
+                key: 'xoa.pool[{#POOL.URL}]'
+            - uuid: 46a2c37e887a44af831a95b2962ee8c4
+              name: 'Pool {#POOL.URL}: Descriptipn'
+              type: DEPENDENT
+              key: 'xoa.pool.description[{#POOL.URL}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.name_description
+              master_item:
+                key: 'xoa.pool[{#POOL.URL}]'
+            - uuid: 64981b8e1f7f49e7a4941ab0866df905
+              name: 'Pool {#POOL.URL}: HA enabled'
+              type: DEPENDENT
+              key: 'xoa.pool.ha.enabled[{#POOL.URL}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.HA_enabled
+              master_item:
+                key: 'xoa.pool[{#POOL.URL}]'
+            - uuid: bb14638e591940389e2ee1b437fa428f
+              name: 'Pool {#POOL.URL}: Name'
+              type: DEPENDENT
+              key: 'xoa.pool.name[{#POOL.URL}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.name_label
+              master_item:
+                key: 'xoa.pool[{#POOL.URL}]'
+            - uuid: d119af9ee0794efa9c5a93ef01301a1a
+              name: 'Pool {#POOL.URL}: Get Values'
+              type: HTTP_AGENT
+              key: 'xoa.pool[{#POOL.URL}]'
+              delay: 15m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              url: '{$XOA.URL}{#POOL.URL}'
+              headers:
+                - name: Cookie
+                  value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+                - name: Accept
+                  value: application/json
+          url: '{$XOA.URL}/rest/v0/pools'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
+          lld_macro_paths:
+            - lld_macro: '{#POOL.URL}'
+              path: $.url
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  response = []
+                  for (v in JSON.parse(value)) {
+                  response.push({"url": JSON.parse(value)[v]})
+                  }
+                  
+                  return JSON.stringify(response)
+      tags:
+        - tag: component
+          value: hypervisor
+        - tag: target
+          value: xen
+      macros:
+        - macro: '{$XOA.AUTH.TOKEN}'
+          value: CHANGE_IF_NEEDED
+          description: 'Authentication Token generated on XOA UI'
+        - macro: '{$XOA.URL}'
+          value: CHANGE_IF_NEEDED
+          description: 'URL where XOA can be reached'
+      valuemaps:
+        - uuid: 0ec95555cba645f796a21bdece34349c
+          name: 'XOA Boolean'
+          mappings:
+            - value: '1'
+              newvalue: 'true'
+            - value: '0'
+              newvalue: 'false'
