@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-27T09:31:45Z'
+  date: '2023-12-27T11:30:22Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -506,7 +506,7 @@ zabbix_export:
           history: '0'
           trends: '0'
           value_type: TEXT
-          url: '{$XOA.URL}/rest/v0/vms/{$XOA.HOST.UUID}'
+          url: '{$XOA.URL}/rest/v0/vms/{$XOA.VM.UUID}'
           headers:
             - name: Cookie
               value: 'authenticationToken={$XOA.AUTH.TOKEN}'
@@ -706,7 +706,7 @@ zabbix_export:
                 - name: 'XCP-NG VM via Xen Orchestra'
               macros:
                 - macro: '{$XOA.VM.UUID}'
-                  value: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
+                  value: '{{#VMS.URL}.regsub("\/rest\/v0\/vms\/([0-9a-f-]*)","\1")}'
               tags:
                 - tag: component
                   value: hypervisor
