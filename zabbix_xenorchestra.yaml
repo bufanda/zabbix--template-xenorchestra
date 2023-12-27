@@ -1,11 +1,13 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-26T14:08:25Z'
+  date: '2023-12-27T09:31:45Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
     - uuid: 7df96b18c230490a9a0a9e2307226338
       name: Templates
+    - uuid: 137f19e6e2dc4219b33553b812627bc2
+      name: 'Virtual machines'
   templates:
     - uuid: 8d4ad92902e6440ca14dfa5256d8bf82
       template: 'XCP-NG Host via Xen Orchestra'
@@ -145,6 +147,20 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//xoa.host.memory.used)/last(//xoa.host.memory.total)*100'
+        - uuid: 81a949d8376b43b0b620de6bcbe3d525
+          name: 'XCP-NG Hosts: Get Missing Patches'
+          type: HTTP_AGENT
+          key: xoa.host.missingpatches.raw
+          delay: 15m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}/missing_patches'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
         - uuid: 3725dfaac75643fcb3cfe0b852a26f70
           name: Hostname
           type: DEPENDENT
@@ -171,6 +187,11 @@ zabbix_export:
                 - $.power_state
           master_item:
             key: xoa.host.raw
+          triggers:
+            - uuid: 484c668a58c54317a61a405b52cc43ec
+              expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.power.state)<>last(/XCP-NG Host via Xen Orchestra/xoa.host.power.state,#1)'
+              name: 'Power state changed'
+              priority: INFO
         - uuid: 11c547b55c424e26bb02d87266980a6f
           name: 'XCP-NG Hosts: Get Values'
           type: HTTP_AGENT
@@ -198,6 +219,25 @@ zabbix_export:
                 - $.rebootRequired
           master_item:
             key: xoa.host.raw
+          triggers:
+            - uuid: 06a3b195183a49d9ac6f37afa802e5a9
+              expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.reboot.required)="true"'
+              name: 'Reboot required for hosts'
+              priority: WARNING
+        - uuid: 077fd836ae1c420792fcf368fa43e8a3
+          name: 'Number of running VMs'
+          type: DEPENDENT
+          key: xoa.host.runningvms
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.residentVms
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.parse(value).length'
+          master_item:
+            key: xoa.host.raw
         - uuid: 745f6fb406c34e3b8ec313a54b2c85cc
           name: 'Host start time'
           type: DEPENDENT
@@ -210,6 +250,268 @@ zabbix_export:
                 - $.startTime
           master_item:
             key: xoa.host.raw
+        - uuid: dab4f3b69f5141048e914d87ed23dd69
+          name: 'Number of Missing Patches'
+          type: DEPENDENT
+          key: xoa.hosts.missingpatches.count
+          delay: '0'
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.parse(value).length'
+          master_item:
+            key: xoa.host.missingpatches.raw
+          triggers:
+            - uuid: b4f671bc3ab8442c87147db31e815ffe
+              expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.hosts.missingpatches.count)>{$XOA.HOST.MISSING.PATCHES.MAX}'
+              name: 'Number of {$XOA.HOST.MISSING.PATCHES.MAX} missing patches exceeded'
+              priority: WARNING
+      tags:
+        - tag: component
+          value: hypervisor
+        - tag: target
+          value: xcp-ng
+      macros:
+        - macro: '{$XOA.AUTH.TOKEN}'
+          value: CHANGE_IF_NEEDED
+          description: 'Authentication Token generated on XOA UI'
+        - macro: '{$XOA.HOST.MISSING.PATCHES.MAX}'
+          value: '1'
+          description: 'Maximum Number of missing patches allowed'
+        - macro: '{$XOA.HOST.UUID}'
+          value: CHANGE_IF_NEEDED
+          description: 'Host UUID'
+        - macro: '{$XOA.URL}'
+          value: CHANGE_IF_NEEDED
+          description: 'URL where XOA can be reached'
+      valuemaps:
+        - uuid: 7de0ad540b0f4fd5ab2b33ef9f79d440
+          name: 'XOA Boolean'
+          mappings:
+            - value: '1'
+              newvalue: 'true'
+            - value: '0'
+              newvalue: 'false'
+    - uuid: b1aa3ddc4db246c3a5e71658dd5a9601
+      template: 'XCP-NG VM via Xen Orchestra'
+      name: 'XCP-NG VM via Xen Orchestra'
+      groups:
+        - name: Templates
+      items:
+        - uuid: 6a01a4edf2364313a72939d2dfb7789c
+          name: 'vCPU active'
+          type: DEPENDENT
+          key: xoa.vm.cpu.active
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.CPUs.number
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 2149aaf9d7904bf4b28f4aaa943f120e
+          name: 'vCPU max'
+          type: DEPENDENT
+          key: xoa.vm.cpu.max
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.CPUs.max
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 2bd0262b02754c49bf1388e392bff454
+          name: 'VM description'
+          type: DEPENDENT
+          key: xoa.vm.description
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.name_description
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 011d9425a4bc4b4cb3cba08d878c0f83
+          name: 'Xen PV driver version'
+          type: DEPENDENT
+          key: xoa.vm.driver.version
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.pvDriversVersion
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 86a3094485084862a3a2d4d1bd9333b2
+          name: 'VM install time'
+          type: DEPENDENT
+          key: xoa.vm.installtime
+          delay: '0'
+          units: unixtime
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.installTime
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 37d6d0b60c654490b5d360b194538f15
+          name: 'Management agent detected'
+          type: DEPENDENT
+          key: xoa.vm.management.agent
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.managementAgentDetected
+          master_item:
+            key: xoa.vms.raw
+          triggers:
+            - uuid: 90dd8a29cfc3457aabb35ce8527683d4
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false"'
+              name: 'No management agent install on VM'
+              priority: INFO
+        - uuid: e72db9c5c0474d099be380a577aafd23
+          name: 'Memory total'
+          type: DEPENDENT
+          key: xoa.vm.memory.total
+          delay: '0'
+          units: B
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.memory.size
+          master_item:
+            key: xoa.vms.raw
+        - uuid: c319917b771c46afbf2fdacf217216d1
+          name: 'Virtualization mode'
+          type: DEPENDENT
+          key: xoa.vm.mode
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.virtualizationMode
+          master_item:
+            key: xoa.vms.raw
+        - uuid: e5f39794e08c4aeb9b2f96abf5dc58dc
+          name: 'VM name'
+          type: DEPENDENT
+          key: xoa.vm.name
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.name_label
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 5397b9f0460742899d91a127b52f2020
+          name: 'OS Distribution'
+          type: DEPENDENT
+          key: xoa.vm.os.distro
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.version.distro
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 4126bf9d15464ecea0f7a0d0fe8fd8b8
+          name: 'OS version'
+          type: DEPENDENT
+          key: xoa.vm.os.version
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.os_version.name
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 2415c2f666e64438ae682c0855c2831b
+          name: 'Power State'
+          type: DEPENDENT
+          key: xoa.vm.power.state
+          delay: '0'
+          trends: '0'
+          value_type: CHAR
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.power_state
+          master_item:
+            key: xoa.vms.raw
+          triggers:
+            - uuid: 4f938791d96b4898860edf870a1bc72e
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#1)'
+              name: 'State of VM changed'
+              priority: AVERAGE
+        - uuid: d3da95b5b2c64e5e82c893e9fbd82743
+          name: 'Number of snapshots'
+          type: DEPENDENT
+          key: xoa.vm.snapshot
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.snapshots
+            - type: JAVASCRIPT
+              parameters:
+                - 'return JSON.parse(value).length'
+          master_item:
+            key: xoa.vms.raw
+          triggers:
+            - uuid: 353d88c34edc4ea3957a4ecc12e6db7b
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.snapshot)>{$XOA.VM.NO.SNAPSHOTS.MAX}'
+              name: 'Number of Snapshots exceeds {$XOA.VM.NO.SNAPSHOTS.MAX}'
+              priority: WARNING
+        - uuid: 889bc4bcaf0744f7ac14c36f45139cc8
+          name: 'VM start time'
+          type: DEPENDENT
+          key: xoa.vm.starttime
+          delay: '0'
+          units: unixtime
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.startTime
+          master_item:
+            key: xoa.vms.raw
+        - uuid: cb8d4b3b8a0442c2aa48853c6ab45af3
+          name: 'Xen Tool Version'
+          type: DEPENDENT
+          key: xoa.vm.tools.version
+          delay: '0'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.xenTools.version
+          master_item:
+            key: xoa.vms.raw
+        - uuid: 27f086c8cf754b789daf6868cf394172
+          name: 'XCP-NG VMS: Get Values'
+          type: HTTP_AGENT
+          key: xoa.vms.raw
+          delay: 15m
+          history: '0'
+          trends: '0'
+          value_type: TEXT
+          url: '{$XOA.URL}/rest/v0/vms/{$XOA.HOST.UUID}'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
       tags:
         - tag: component
           value: hypervisor
@@ -225,8 +527,12 @@ zabbix_export:
         - macro: '{$XOA.URL}'
           value: CHANGE_IF_NEEDED
           description: 'URL where XOA can be reached'
+        - macro: '{$XOA.VM.NO.SNAPSHOTS.MAX}'
+          value: '1'
+          description: 'Max number of snapshots allowed'
+        - macro: '{$XOA.VM.UUID}'
       valuemaps:
-        - uuid: 7de0ad540b0f4fd5ab2b33ef9f79d440
+        - uuid: 546880e65268446ba8d3b319f837b7eb
           name: 'XOA Boolean'
           mappings:
             - value: '1'
@@ -262,7 +568,7 @@ zabbix_export:
                 - tag: componenet
                   value: Hypervisor
                 - tag: target
-                  value: xen
+                  value: host
           url: '{$XOA.URL}/rest/v0/hosts'
           headers:
             - name: Cookie
@@ -286,6 +592,7 @@ zabbix_export:
           name: 'Discovery Pools'
           type: HTTP_AGENT
           key: xoa.pool.discovery
+          delay: 1h
           lifetime: 1d
           item_prototypes:
             - uuid: 7f4a8af6115b4128afb280c678bc4db9
@@ -371,6 +678,48 @@ zabbix_export:
               value: application/json
           lld_macro_paths:
             - lld_macro: '{#POOL.URL}'
+              path: $.url
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  response = []
+                  for (v in JSON.parse(value)) {
+                  response.push({"url": JSON.parse(value)[v]})
+                  }
+                  
+                  return JSON.stringify(response)
+        - uuid: 5485ca1d330d4dffa4a03579729428e6
+          name: 'Discovery VMs'
+          type: HTTP_AGENT
+          key: xoa.vms.discovery
+          delay: 1h
+          lifetime: 1d
+          host_prototypes:
+            - uuid: 78bf8b747c7547f2990fcf9f4bac56ae
+              host: '{{#VMS.URL}.regsub("\/rest\/v0\/vms\/([0-9a-f-]*)","\1")}'
+              name: '{{#VMS.URL}.regsub("\/rest\/v0\/vms\/([0-9a-f-]*)","\1")}'
+              group_links:
+                - group:
+                    name: 'Virtual machines'
+              templates:
+                - name: 'XCP-NG VM via Xen Orchestra'
+              macros:
+                - macro: '{$XOA.VM.UUID}'
+                  value: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
+              tags:
+                - tag: component
+                  value: hypervisor
+                - tag: target
+                  value: guest
+          url: '{$XOA.URL}/rest/v0/vms'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
+          lld_macro_paths:
+            - lld_macro: '{#VMS.URL}'
               path: $.url
           preprocessing:
             - type: JAVASCRIPT
