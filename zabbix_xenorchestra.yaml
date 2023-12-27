@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-27T11:30:22Z'
+  date: '2023-12-27T11:40:14Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -338,6 +338,8 @@ zabbix_export:
           type: DEPENDENT
           key: xoa.vm.driver.version
           delay: '0'
+          trends: '0'
+          value_type: CHAR
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -422,7 +424,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - $.version.distro
+                - $.os_version.distro
           master_item:
             key: xoa.vms.raw
         - uuid: 4126bf9d15464ecea0f7a0d0fe8fd8b8
@@ -492,6 +494,8 @@ zabbix_export:
           type: DEPENDENT
           key: xoa.vm.tools.version
           delay: '0'
+          trends: '0'
+          value_type: CHAR
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -516,7 +520,7 @@ zabbix_export:
         - tag: component
           value: hypervisor
         - tag: target
-          value: xcp-ng
+          value: guests
       macros:
         - macro: '{$XOA.AUTH.TOKEN}'
           value: CHANGE_IF_NEEDED
