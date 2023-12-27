@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-27T11:40:14Z'
+  date: '2023-12-27T20:03:53Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -600,7 +600,7 @@ zabbix_export:
           lifetime: 1d
           item_prototypes:
             - uuid: 7f4a8af6115b4128afb280c678bc4db9
-              name: 'Pool {#POOL.URL}: CPU Cores'
+              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: CPU Cores'
               type: DEPENDENT
               key: 'xoa.pool.cpu.cores[{#POOL.URL}]'
               delay: '0'
@@ -611,7 +611,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: f6d83eef5fd9449d97ac649bb0f6e40e
-              name: 'Pool {#POOL.URL}: CPU Sockets'
+              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: CPU Sockets'
               type: DEPENDENT
               key: 'xoa.pool.cpu.sockets[{#POOL.URL}]'
               delay: '0'
@@ -622,7 +622,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: 46a2c37e887a44af831a95b2962ee8c4
-              name: 'Pool {#POOL.URL}: Descriptipn'
+              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")} Descriptipn'
               type: DEPENDENT
               key: 'xoa.pool.description[{#POOL.URL}]'
               delay: '0'
@@ -635,7 +635,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: 64981b8e1f7f49e7a4941ab0866df905
-              name: 'Pool {#POOL.URL}: HA enabled'
+              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: HA enabled'
               type: DEPENDENT
               key: 'xoa.pool.ha.enabled[{#POOL.URL}]'
               delay: '0'
@@ -648,7 +648,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: bb14638e591940389e2ee1b437fa428f
-              name: 'Pool {#POOL.URL}: Name'
+              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: Name'
               type: DEPENDENT
               key: 'xoa.pool.name[{#POOL.URL}]'
               delay: '0'
@@ -661,7 +661,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: d119af9ee0794efa9c5a93ef01301a1a
-              name: 'Pool {#POOL.URL}: Get Values'
+              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: Get Values'
               type: HTTP_AGENT
               key: 'xoa.pool[{#POOL.URL}]'
               delay: 15m
@@ -682,6 +682,142 @@ zabbix_export:
               value: application/json
           lld_macro_paths:
             - lld_macro: '{#POOL.URL}'
+              path: $.url
+          preprocessing:
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  response = []
+                  for (v in JSON.parse(value)) {
+                  response.push({"url": JSON.parse(value)[v]})
+                  }
+                  
+                  return JSON.stringify(response)
+        - uuid: 59ad3f67fa2644be8f8a63ceb7dd1039
+          name: 'Discovery SRs'
+          type: HTTP_AGENT
+          key: xoa.sr.discovery
+          delay: 1h
+          lifetime: 1d
+          item_prototypes:
+            - uuid: 2c7ddde760c7485fbfd5afd06c0ca9f6
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: In maintenance mode'
+              type: DEPENDENT
+              key: 'xoa.sr.maintenance[{#SR.URL}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.inMaintenanceMode
+              master_item:
+                key: 'xoa.sr.raw[{#SR.URL}]'
+            - uuid: ac01c8b01494403797fbdf84657ecbc1
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Name'
+              type: DEPENDENT
+              key: 'xoa.sr.name[{#SR.URL}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.name_label
+              master_item:
+                key: 'xoa.sr.raw[{#SR.URL}]'
+            - uuid: a9c8007dfb15454da2ec7d3b2ef78c36
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Get Values'
+              type: HTTP_AGENT
+              key: 'xoa.sr.raw[{#SR.URL}]'
+              delay: 15m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              url: '{$XOA.URL}{#SR.URL}'
+              headers:
+                - name: Cookie
+                  value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+                - name: Accept
+                  value: application/json
+            - uuid: c3d42712ef4c4941b5d6dcf301abd4f5
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} Size'
+              type: DEPENDENT
+              key: 'xoa.sr.size[{#SR.URL}]'
+              delay: '0'
+              units: B
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.size
+              master_item:
+                key: 'xoa.sr.raw[{#SR.URL}]'
+            - uuid: 5c9753ddfd4040a4b2f09bee5b218f37
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Content Type'
+              type: DEPENDENT
+              key: 'xoa.sr.type.content[{#SR.URL}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.content_type
+              master_item:
+                key: 'xoa.sr.raw[{#SR.URL}]'
+            - uuid: 09c0b4829e674fbaa3b80ce030f311f3
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} Type'
+              type: DEPENDENT
+              key: 'xoa.sr.type[{#SR.URL}]'
+              delay: '0'
+              trends: '0'
+              value_type: CHAR
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.SR_type
+              master_item:
+                key: 'xoa.sr.raw[{#SR.URL}]'
+            - uuid: 3f678af9e8fc4c0dbfab055155749c2c
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Used percentage'
+              type: CALCULATED
+              key: 'xoa.sr.used.percentage[{#SR.URL}]'
+              delay: 15m
+              value_type: FLOAT
+              units: '%'
+              params: 'last(//xoa.sr.used.physical[{#SR.URL}])/last(//xoa.sr.size[{#SR.URL}])*100'
+              trigger_prototypes:
+                - uuid: fb16b143e0ef45ea91eb423f2530cdd0
+                  expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
+                  name: 'Free space on SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} is critical low'
+                  priority: HIGH
+                - uuid: 087dcb24233f4f3c8a88bc7d01abe3a4
+                  expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.WARN}'
+                  name: 'Free space on SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} is low'
+                  priority: WARNING
+                  dependencies:
+                    - name: 'Free space on SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} is critical low'
+                      expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
+            - uuid: 57b22801aba547bfa90a3304a59f53dc
+              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Physical Usage'
+              type: DEPENDENT
+              key: 'xoa.sr.used.physical[{#SR.URL}]'
+              delay: '0'
+              units: B
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.physical_usage
+              master_item:
+                key: 'xoa.sr.raw[{#SR.URL}]'
+          url: '{$XOA.URL}/rest/v0/srs'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
+          lld_macro_paths:
+            - lld_macro: '{#SR.URL}'
               path: $.url
           preprocessing:
             - type: JAVASCRIPT
@@ -744,6 +880,12 @@ zabbix_export:
         - macro: '{$XOA.AUTH.TOKEN}'
           value: CHANGE_IF_NEEDED
           description: 'Authentication Token generated on XOA UI'
+        - macro: '{$XOA.SR.THRESHOLD.CRIT}'
+          value: '95'
+          description: 'Critical threshold for SR usage'
+        - macro: '{$XOA.SR.THRESHOLD.WARN}'
+          value: '75'
+          description: 'Warn threshold for SR usage'
         - macro: '{$XOA.URL}'
           value: CHANGE_IF_NEEDED
           description: 'URL where XOA can be reached'
