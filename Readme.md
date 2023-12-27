@@ -31,8 +31,8 @@ Thorsten Liepert
 
 |Name|Description|Default|
 |----|-----------|-------|
-|$XOA.AUTH.TOKEN}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
-|$XOA.URL}|<p>VMware service user name</p>||
+|{$XOA.AUTH.TOKEN}|<p>VMware service (vCenter or ESX hypervisor) SDK URL (https://servername/sdk)</p>||
+|{$XOA.URL}|<p>VMware service user name</p>||
 
 ## Feedback
 
