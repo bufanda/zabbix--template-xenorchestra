@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-28T13:12:15Z'
+  date: '2023-12-28T13:30:47Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -608,13 +608,31 @@ zabbix_export:
               path: $.uuid
         - uuid: ba152d09c30a48fda5e2385615ebe76d
           name: 'Discovery Pools'
-          type: HTTP_AGENT
+          type: SCRIPT
           key: xoa.pool.discovery
           delay: 1h
+          params: |
+            try {
+            var params = JSON.parse(value);
+            var req = new HttpRequest();
+            req.addHeader('Cookie: authenticationToken=' + params.token);
+            var response = req.get(encodeURI(params.url + '/rest/v0/pools'));
+            } catch(error) {
+             Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/pools Error: " + error);
+             if (!Number.isInteger(error))
+                return 520;
+            }
+            var retVal = []
+            for (r=0; r < JSON.parse(response).length; r++) {
+              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+              poolInfo = JSON.parse(resp);
+              retVal.push({"url": JSON.parse(response)[r], "uuid": poolInfo.uuid, 'name': poolInfo.name_label});
+            }
+            return JSON.stringify(retVal);
           lifetime: 1d
           item_prototypes:
             - uuid: 7f4a8af6115b4128afb280c678bc4db9
-              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: CPU Cores'
+              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): CPU Cores'
               type: DEPENDENT
               key: 'xoa.pool.cpu.cores[{#POOL.URL}]'
               delay: '0'
@@ -625,7 +643,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: f6d83eef5fd9449d97ac649bb0f6e40e
-              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: CPU Sockets'
+              name: 'Pool{#POOL.NAME} ({#POOL.UUID}): CPU Sockets'
               type: DEPENDENT
               key: 'xoa.pool.cpu.sockets[{#POOL.URL}]'
               delay: '0'
@@ -636,7 +654,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: 46a2c37e887a44af831a95b2962ee8c4
-              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")} Descriptipn'
+              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Descriptipn'
               type: DEPENDENT
               key: 'xoa.pool.description[{#POOL.URL}]'
               delay: '0'
@@ -649,7 +667,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: 64981b8e1f7f49e7a4941ab0866df905
-              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: HA enabled'
+              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): HA enabled'
               type: DEPENDENT
               key: 'xoa.pool.ha.enabled[{#POOL.URL}]'
               delay: '0'
@@ -662,7 +680,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: bb14638e591940389e2ee1b437fa428f
-              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: Name'
+              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Name'
               type: DEPENDENT
               key: 'xoa.pool.name[{#POOL.URL}]'
               delay: '0'
@@ -675,7 +693,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: d119af9ee0794efa9c5a93ef01301a1a
-              name: 'Pool {{#POOL.URL}.regsub("\/rest\/v0\/pools\/([0-9a-f-]*)","\1")}: Get Values'
+              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Get Values'
               type: HTTP_AGENT
               key: 'xoa.pool[{#POOL.URL}]'
               delay: 15m
@@ -688,34 +706,45 @@ zabbix_export:
                   value: 'authenticationToken={$XOA.AUTH.TOKEN}'
                 - name: Accept
                   value: application/json
-          url: '{$XOA.URL}/rest/v0/pools'
-          headers:
-            - name: Cookie
-              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
-            - name: Accept
-              value: application/json
+          parameters:
+            - name: token
+              value: '{$XOA.AUTH.TOKEN}'
+            - name: url
+              value: '{$XOA.URL}'
           lld_macro_paths:
+            - lld_macro: '{#POOL.NAME}'
+              path: $.name
             - lld_macro: '{#POOL.URL}'
               path: $.url
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  response = []
-                  for (v in JSON.parse(value)) {
-                  response.push({"url": JSON.parse(value)[v]})
-                  }
-                  
-                  return JSON.stringify(response)
+            - lld_macro: '{#POOL.UUID}'
+              path: $.uuid
         - uuid: 59ad3f67fa2644be8f8a63ceb7dd1039
           name: 'Discovery SRs'
-          type: HTTP_AGENT
+          type: SCRIPT
           key: xoa.sr.discovery
           delay: 1h
+          params: |
+            try {
+            var params = JSON.parse(value);
+            var req = new HttpRequest();
+            req.addHeader('Cookie: authenticationToken=' + params.token);
+            var response = req.get(encodeURI(params.url + '/rest/v0/srs'));
+            } catch(error) {
+             Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/srs Error: " + error);
+             if (!Number.isInteger(error))
+                return 520;
+            }
+            var retVal = []
+            for (r=0; r < JSON.parse(response).length; r++) {
+              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+              srInfo = JSON.parse(resp);
+              retVal.push({"url": JSON.parse(response)[r], "uuid": srInfo.uuid, 'name': srInfo.name_label});
+            }
+            return JSON.stringify(retVal);
           lifetime: 1d
           item_prototypes:
             - uuid: 2c7ddde760c7485fbfd5afd06c0ca9f6
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: In maintenance mode'
+              name: 'SR {#SR.NAME} ({#SR.UUID}): In maintenance mode'
               type: DEPENDENT
               key: 'xoa.sr.maintenance[{#SR.URL}]'
               delay: '0'
@@ -728,7 +757,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: ac01c8b01494403797fbdf84657ecbc1
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Name'
+              name: 'SR {#SR.NAME} ({#SR.UUID}): Name'
               type: DEPENDENT
               key: 'xoa.sr.name[{#SR.URL}]'
               delay: '0'
@@ -741,7 +770,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: a9c8007dfb15454da2ec7d3b2ef78c36
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Get Values'
+              name: 'SR {#SR.NAME} ({#SR.UUID}): Get Values'
               type: HTTP_AGENT
               key: 'xoa.sr.raw[{#SR.URL}]'
               delay: 15m
@@ -755,7 +784,7 @@ zabbix_export:
                 - name: Accept
                   value: application/json
             - uuid: c3d42712ef4c4941b5d6dcf301abd4f5
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} Size'
+              name: 'SR {#SR.NAME} ({#SR.UUID}): Size'
               type: DEPENDENT
               key: 'xoa.sr.size[{#SR.URL}]'
               delay: '0'
@@ -767,7 +796,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: 5c9753ddfd4040a4b2f09bee5b218f37
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Content Type'
+              name: 'SR {#SR.NAME} ({#SR.UUID}) Content Type'
               type: DEPENDENT
               key: 'xoa.sr.type.content[{#SR.URL}]'
               delay: '0'
@@ -780,7 +809,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: 09c0b4829e674fbaa3b80ce030f311f3
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} Type'
+              name: 'SR {#SR.NAME} ({#SR.UUID}): Type'
               type: DEPENDENT
               key: 'xoa.sr.type[{#SR.URL}]'
               delay: '0'
@@ -793,7 +822,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: 3f678af9e8fc4c0dbfab055155749c2c
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Used percentage'
+              name: 'SR {#SR.NAME} ({#SR.UUID}): Used percentage'
               type: CALCULATED
               key: 'xoa.sr.used.percentage[{#SR.URL}]'
               delay: 15m
@@ -803,17 +832,17 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: fb16b143e0ef45ea91eb423f2530cdd0
                   expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
-                  name: 'Free space on SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} is critical low'
+                  name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is critical low'
                   priority: HIGH
                 - uuid: 087dcb24233f4f3c8a88bc7d01abe3a4
                   expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.WARN}'
-                  name: 'Free space on SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} is low'
+                  name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is low'
                   priority: WARNING
                   dependencies:
-                    - name: 'Free space on SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")} is critical low'
+                    - name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is critical low'
                       expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
             - uuid: 57b22801aba547bfa90a3304a59f53dc
-              name: 'SR {{#SR.URL}.regsub("\/rest\/v0\/srs\/([0-9a-f-]*)","\1")}: Physical Usage'
+              name: 'SR {#SR.NAME} ({#SR.UUID}): Physical Usage'
               type: DEPENDENT
               key: 'xoa.sr.used.physical[{#SR.URL}]'
               delay: '0'
@@ -824,67 +853,75 @@ zabbix_export:
                     - $.physical_usage
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
-          url: '{$XOA.URL}/rest/v0/srs'
-          headers:
-            - name: Cookie
-              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
-            - name: Accept
-              value: application/json
+          parameters:
+            - name: token
+              value: '{$XOA.AUTH.TOKEN}'
+            - name: url
+              value: '{$XOA.URL}'
           lld_macro_paths:
+            - lld_macro: '{#SR.NAME}'
+              path: $.name
             - lld_macro: '{#SR.URL}'
               path: $.url
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  response = []
-                  for (v in JSON.parse(value)) {
-                  response.push({"url": JSON.parse(value)[v]})
-                  }
-                  
-                  return JSON.stringify(response)
+            - lld_macro: '{#SR.UUID}'
+              path: $.uuid
         - uuid: 5485ca1d330d4dffa4a03579729428e6
           name: 'Discovery VMs'
-          type: HTTP_AGENT
+          type: SCRIPT
           key: xoa.vms.discovery
           delay: 1h
+          params: |
+            try {
+            var params = JSON.parse(value);
+            var req = new HttpRequest();
+            req.addHeader('Cookie: authenticationToken=' + params.token);
+            var response = req.get(encodeURI(params.url + '/rest/v0/vms'));
+            } catch(error) {
+             Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/vms Error: " + error);
+             if (!Number.isInteger(error))
+                return 520;
+            }
+            var retVal = []
+            for (r=0; r < JSON.parse(response).length; r++) {
+              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+              vmsInfo = JSON.parse(resp);
+              retVal.push({"url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label});
+            }
+            return JSON.stringify(retVal);
           lifetime: 1d
           host_prototypes:
             - uuid: 78bf8b747c7547f2990fcf9f4bac56ae
-              host: '{{#VMS.URL}.regsub("\/rest\/v0\/vms\/([0-9a-f-]*)","\1")}'
-              name: '{{#VMS.URL}.regsub("\/rest\/v0\/vms\/([0-9a-f-]*)","\1")}'
+              host: '{#VMS.UUID}'
+              name: 'VM-{#VMS.NAME}'
               group_links:
                 - group:
                     name: 'Virtual machines'
               templates:
                 - name: 'XCP-NG VM via Xen Orchestra'
               macros:
+                - macro: '{$XOA.VM.NAME}'
+                  value: '{#VMS.NAME}'
+                - macro: '{$XOA.VM.PATH}'
+                  value: '{#VMS.URL}'
                 - macro: '{$XOA.VM.UUID}'
-                  value: '{{#VMS.URL}.regsub("\/rest\/v0\/vms\/([0-9a-f-]*)","\1")}'
+                  value: '{#VMS.UUID}'
               tags:
                 - tag: component
                   value: hypervisor
                 - tag: target
                   value: guest
-          url: '{$XOA.URL}/rest/v0/vms'
-          headers:
-            - name: Cookie
-              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
-            - name: Accept
-              value: application/json
+          parameters:
+            - name: token
+              value: '{$XOA.AUTH.TOKEN}'
+            - name: url
+              value: '{$XOA.URL}'
           lld_macro_paths:
+            - lld_macro: '{#VMS.NAME}'
+              path: $.name
             - lld_macro: '{#VMS.URL}'
               path: $.url
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  response = []
-                  for (v in JSON.parse(value)) {
-                  response.push({"url": JSON.parse(value)[v]})
-                  }
-                  
-                  return JSON.stringify(response)
+            - lld_macro: '{#VMS.UUID}'
+              path: $.uuid
       tags:
         - tag: component
           value: hypervisor
