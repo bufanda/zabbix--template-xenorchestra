@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-27T20:03:53Z'
+  date: '2023-12-28T13:12:15Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -549,49 +549,63 @@ zabbix_export:
       groups:
         - name: Templates
       discovery_rules:
-        - uuid: c7416b23bd7940109b07ef3d40f5a0f0
+        - uuid: 0f0abc26d9884936ad59800f1e2778a0
           name: 'Discovery Hosts'
-          type: HTTP_AGENT
+          type: SCRIPT
           key: xoa.hosts.discovery
           delay: 1h
+          params: |
+            try {
+            var params = JSON.parse(value);
+            var req = new HttpRequest();
+            req.addHeader('Cookie: authenticationToken=' + params.token);
+            var response = req.get(encodeURI(params.url + '/rest/v0/hosts'));
+            } catch(error) {
+             Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/hosts Error: " + error);
+             if (!Number.isInteger(error))
+                return 520;
+            }
+            var retVal = []
+            for (r=0; r < JSON.parse(response).length; r++) {
+              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+              hostInfo = JSON.parse(resp);
+              retVal.push({"url": JSON.parse(response)[r], "uuid": hostInfo.uuid, 'name': hostInfo.name_label});
+            }
+            return JSON.stringify(retVal);
           lifetime: 1d
           host_prototypes:
-            - uuid: c15f47a062bd4e71872ade31b581b9e1
-              host: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
-              name: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
+            - uuid: 49e0b0dee6964027907b68867bd0bada
+              host: '{#HOSTS.UUID}'
+              name: 'HV-{#HOSTS.NAME}'
               group_links:
                 - group:
                     name: Hypervisors
               templates:
                 - name: 'XCP-NG Host via Xen Orchestra'
               macros:
+                - macro: '{$XOA.HOST.NAME}'
+                  value: '{#HOSTS.NAME}'
+                - macro: '{$XOA.HOST.PATH}'
+                  value: '{#HOSTS.URL}'
                 - macro: '{$XOA.HOST.UUID}'
-                  value: '{{#HOSTS.URL}.regsub("\/rest\/v0\/hosts\/([0-9a-f-]*)","\1")}'
-                  description: 'Host UUID'
+                  value: '{#HOSTS.UUID}'
               tags:
                 - tag: componenet
-                  value: Hypervisor
+                  value: Hypervisors
                 - tag: target
-                  value: host
-          url: '{$XOA.URL}/rest/v0/hosts'
-          headers:
-            - name: Cookie
-              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
-            - name: Accept
-              value: application/json
+                  value: XCP-NG
+          parameters:
+            - name: token
+              value: '{$XOA.AUTH.TOKEN}'
+            - name: url
+              value: '{$XOA.URL}'
           lld_macro_paths:
+            - lld_macro: '{#HOSTS.NAME}'
+              path: $.name
             - lld_macro: '{#HOSTS.URL}'
               path: $.url
-          preprocessing:
-            - type: JAVASCRIPT
-              parameters:
-                - |
-                  response = []
-                  for (v in JSON.parse(value)) {
-                  response.push({"url": JSON.parse(value)[v]})
-                  }
-                  
-                  return JSON.stringify(response)
+            - lld_macro: '{#HOSTS.UUID}'
+              path: $.uuid
         - uuid: ba152d09c30a48fda5e2385615ebe76d
           name: 'Discovery Pools'
           type: HTTP_AGENT
