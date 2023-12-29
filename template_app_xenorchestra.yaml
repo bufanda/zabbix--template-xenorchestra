@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-29T12:59:14Z'
+  date: '2023-12-29T15:30:21Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -582,7 +582,7 @@ zabbix_export:
             - uuid: b16275be3b5741d9b199b3965856c86f
               name: 'SR {#BACKUP.NAME} ({#BACKUP.UUID}): Get Values'
               type: HTTP_AGENT
-              key: xoa.backup.raw
+              key: 'xoa.backup.raw[{#BACKUP.UUID}]'
               delay: 15m
               history: '0'
               trends: '0'
