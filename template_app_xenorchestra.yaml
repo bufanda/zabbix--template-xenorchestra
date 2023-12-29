@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-29T12:23:40Z'
+  date: '2023-12-29T12:59:14Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -189,9 +189,11 @@ zabbix_export:
             key: xoa.host.raw
           triggers:
             - uuid: 484c668a58c54317a61a405b52cc43ec
-              expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.power.state)<>last(/XCP-NG Host via Xen Orchestra/xoa.host.power.state,#1)'
+              expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.power.state)<>last(/XCP-NG Host via Xen Orchestra/xoa.host.power.state,#2)'
+              recovery_mode: NONE
               name: 'Power state changed'
               priority: INFO
+              manual_close: 'YES'
         - uuid: 11c547b55c424e26bb02d87266980a6f
           name: 'XCP-NG Hosts: Get Values'
           type: HTTP_AGENT
@@ -455,9 +457,11 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 4f938791d96b4898860edf870a1bc72e
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#1)'
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#2)'
+              recovery_mode: NONE
               name: 'State of VM changed'
               priority: AVERAGE
+              manual_close: 'YES'
         - uuid: d3da95b5b2c64e5e82c893e9fbd82743
           name: 'Number of snapshots'
           type: DEPENDENT
