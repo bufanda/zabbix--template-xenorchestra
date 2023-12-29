@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-28T13:30:47Z'
+  date: '2023-12-29T12:23:40Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -549,6 +549,58 @@ zabbix_export:
       groups:
         - name: Templates
       discovery_rules:
+        - uuid: 4f543445aeb1465ebb10fe09d895c661
+          name: 'Discovery Backups'
+          type: SCRIPT
+          key: xoa.backup.discovery
+          delay: 1h
+          status: DISABLED
+          params: |
+            try {
+            var params = JSON.parse(value);
+            var req = new HttpRequest();
+            req.addHeader('Cookie: authenticationToken=' + params.token);
+            var response = req.get(encodeURI(params.url + '/rest/v0/backup/jobs/vm'));
+            } catch(error) {
+             Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/backup/jobs/vm Error: " + error);
+             if (!Number.isInteger(error))
+                return 520;
+            }
+            var retVal = []
+            for (r=0; r < JSON.parse(response).length; r++) {
+              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+              srInfo = JSON.parse(resp);
+              retVal.push({"url": JSON.parse(response)[r], "uuid": srInfo.uuid, 'name': srInfo.name_label});
+            }
+            return JSON.stringify(retVal);
+          lifetime: 1d
+          item_prototypes:
+            - uuid: b16275be3b5741d9b199b3965856c86f
+              name: 'SR {#BACKUP.NAME} ({#BACKUP.UUID}): Get Values'
+              type: HTTP_AGENT
+              key: xoa.backup.raw
+              delay: 15m
+              history: '0'
+              trends: '0'
+              value_type: TEXT
+              url: '{$XOA.URL}{#BACKUP.URL}'
+              headers:
+                - name: Cookie
+                  value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+                - name: Accept
+                  value: application/json
+          parameters:
+            - name: token
+              value: '{$XOA.AUTH.TOKEN}'
+            - name: url
+              value: '{$XOA.URL}'
+          lld_macro_paths:
+            - lld_macro: '{#BACKUP.NAME}'
+              path: $.name
+            - lld_macro: '{#BACKUP.URL}'
+              path: $.url
+            - lld_macro: '{#BACKUP.UUID}'
+              path: $.uuid
         - uuid: 0f0abc26d9884936ad59800f1e2778a0
           name: 'Discovery Hosts'
           type: SCRIPT
