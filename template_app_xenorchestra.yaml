@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2023-12-29T15:30:21Z'
+  date: '2024-01-02T08:39:31Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -147,6 +147,18 @@ zabbix_export:
           value_type: FLOAT
           units: '%'
           params: 'last(//xoa.host.memory.used)/last(//xoa.host.memory.total)*100'
+          triggers:
+            - uuid: 29677931a1b944038a687c8c28c4d015
+              expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.memory.used.percent)>{$XOA.MEMORY.CRIT}'
+              name: 'Memory usage critical high'
+              priority: HIGH
+            - uuid: 9de3ff6c29d945a7b8ca5a2bb0a78493
+              expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.memory.used.percent)>{$XOA.MEMORY.WARN}'
+              name: 'Memory usage exceeds {$XOA.MEMORY.WARN}'
+              priority: WARNING
+              dependencies:
+                - name: 'Memory usage critical high'
+                  expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.memory.used.percent)>{$XOA.MEMORY.CRIT}'
         - uuid: 81a949d8376b43b0b620de6bcbe3d525
           name: 'XCP-NG Hosts: Get Missing Patches'
           type: HTTP_AGENT
@@ -283,6 +295,12 @@ zabbix_export:
         - macro: '{$XOA.HOST.UUID}'
           value: CHANGE_IF_NEEDED
           description: 'Host UUID'
+        - macro: '{$XOA.MEMORY.CRIT}'
+          value: '90'
+          description: 'Critical memory usage'
+        - macro: '{$XOA.MEMORY.WARN}'
+          value: '75'
+          description: 'Warn when memory usage is above'
         - macro: '{$XOA.URL}'
           value: CHANGE_IF_NEEDED
           description: 'URL where XOA can be reached'
@@ -378,6 +396,7 @@ zabbix_export:
               expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false"'
               name: 'No management agent install on VM'
               priority: INFO
+              manual_close: 'YES'
         - uuid: e72db9c5c0474d099be380a577aafd23
           name: 'Memory total'
           type: DEPENDENT
