@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-02T08:39:31Z'
+  date: '2024-01-03T08:26:49Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -48,6 +48,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.name_description
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
           master_item:
             key: xoa.host.raw
         - uuid: a6343812baea4750b24def6a3ef71f70
@@ -74,6 +77,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.productBrand
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
           master_item:
             key: xoa.host.raw
         - uuid: 494f4ddea1cf40398641295be217878a
@@ -87,6 +93,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.version
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
           master_item:
             key: xoa.host.raw
         - uuid: c1c9cee844f34ff289b32559493af04f
@@ -100,6 +109,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.build
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
           master_item:
             key: xoa.host.raw
         - uuid: ecf042cea23e45e89954fe6fc499be86
@@ -113,6 +125,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.hvmCapable
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: xoa.host.raw
         - uuid: 4026336d2d97475e9019522c73535574
@@ -143,7 +158,7 @@ zabbix_export:
           name: 'Memory used percent'
           type: CALCULATED
           key: xoa.host.memory.used.percent
-          delay: 15m
+          delay: 5m
           value_type: FLOAT
           units: '%'
           params: 'last(//xoa.host.memory.used)/last(//xoa.host.memory.total)*100'
@@ -184,6 +199,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.name_label
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 12h
           master_item:
             key: xoa.host.raw
         - uuid: 5b2435e1c5dd49c7be4b7cc1dc31e64d
@@ -210,7 +228,7 @@ zabbix_export:
           name: 'XCP-NG Hosts: Get Values'
           type: HTTP_AGENT
           key: xoa.host.raw
-          delay: 15m
+          delay: 5m
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -262,6 +280,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.startTime
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: xoa.host.raw
         - uuid: dab4f3b69f5141048e914d87ed23dd69
@@ -351,6 +372,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.name_description
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: xoa.vms.raw
         - uuid: 011d9425a4bc4b4cb3cba08d878c0f83
@@ -364,6 +388,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.pvDriversVersion
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: xoa.vms.raw
         - uuid: 86a3094485084862a3a2d4d1bd9333b2
@@ -376,6 +403,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.installTime
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: xoa.vms.raw
         - uuid: 37d6d0b60c654490b5d360b194538f15
@@ -420,6 +450,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.virtualizationMode
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: xoa.vms.raw
         - uuid: e5f39794e08c4aeb9b2f96abf5dc58dc
@@ -433,6 +466,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.name_label
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 24h
           master_item:
             key: xoa.vms.raw
         - uuid: 5397b9f0460742899d91a127b52f2020
@@ -446,6 +482,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.os_version.distro
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: xoa.vms.raw
         - uuid: 4126bf9d15464ecea0f7a0d0fe8fd8b8
@@ -459,6 +498,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.os_version.name
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1d
           master_item:
             key: xoa.vms.raw
         - uuid: 2415c2f666e64438ae682c0855c2831b
@@ -510,6 +552,9 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.startTime
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: xoa.vms.raw
         - uuid: cb8d4b3b8a0442c2aa48853c6ab45af3
@@ -523,13 +568,16 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.xenTools.version
+            - type: DISCARD_UNCHANGED_HEARTBEAT
+              parameters:
+                - 1h
           master_item:
             key: xoa.vms.raw
         - uuid: 27f086c8cf754b789daf6868cf394172
           name: 'XCP-NG VMS: Get Values'
           type: HTTP_AGENT
           key: xoa.vms.raw
-          delay: 15m
+          delay: 5m
           history: '0'
           trends: '0'
           value_type: TEXT
@@ -739,6 +787,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.name_description
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: 64981b8e1f7f49e7a4941ab0866df905
@@ -765,6 +816,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.name_label
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: d119af9ee0794efa9c5a93ef01301a1a
@@ -842,13 +896,16 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.name_label
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 12h
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: a9c8007dfb15454da2ec7d3b2ef78c36
               name: 'SR {#SR.NAME} ({#SR.UUID}): Get Values'
               type: HTTP_AGENT
               key: 'xoa.sr.raw[{#SR.URL}]'
-              delay: 15m
+              delay: 5m
               history: '0'
               trends: '0'
               value_type: TEXT
@@ -881,6 +938,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.content_type
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: 09c0b4829e674fbaa3b80ce030f311f3
@@ -894,13 +954,16 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.SR_type
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 6h
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
             - uuid: 3f678af9e8fc4c0dbfab055155749c2c
               name: 'SR {#SR.NAME} ({#SR.UUID}): Used percentage'
               type: CALCULATED
               key: 'xoa.sr.used.percentage[{#SR.URL}]'
-              delay: 15m
+              delay: 5m
               value_type: FLOAT
               units: '%'
               params: 'last(//xoa.sr.used.physical[{#SR.URL}])/last(//xoa.sr.size[{#SR.URL}])*100'
