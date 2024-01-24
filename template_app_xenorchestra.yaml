@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-01-03T08:26:49Z'
+  date: '2024-01-24T10:01:43Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -690,9 +690,15 @@ zabbix_export:
             }
             var retVal = []
             for (r=0; r < JSON.parse(response).length; r++) {
-              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
-              hostInfo = JSON.parse(resp);
-              retVal.push({"url": JSON.parse(response)[r], "uuid": hostInfo.uuid, 'name': hostInfo.name_label});
+              try {
+                resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+                hostInfo = JSON.parse(resp);
+                retVal.push({"url": JSON.parse(response)[r], "uuid": hostInfo.uuid, 'name': hostInfo.name_label});
+              } catch(error) {
+                Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/hosts Error: " + error);
+                if(!Number.isInteger(error))
+                  return 500;
+            }
             }
             return JSON.stringify(retVal);
           lifetime: 1d
@@ -747,9 +753,15 @@ zabbix_export:
             }
             var retVal = []
             for (r=0; r < JSON.parse(response).length; r++) {
-              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
-              poolInfo = JSON.parse(resp);
-              retVal.push({"url": JSON.parse(response)[r], "uuid": poolInfo.uuid, 'name': poolInfo.name_label});
+              try {
+                resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+                poolInfo = JSON.parse(resp);
+                retVal.push({"url": JSON.parse(response)[r], "uuid": poolInfo.uuid, 'name': poolInfo.name_label});
+              } catch(error) {
+                 Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/pools Error: " + error);
+                 if (!Number.isInteger(error))
+                   return 520;
+              }
             }
             return JSON.stringify(retVal);
           lifetime: 1d
@@ -865,9 +877,15 @@ zabbix_export:
             }
             var retVal = []
             for (r=0; r < JSON.parse(response).length; r++) {
-              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
-              srInfo = JSON.parse(resp);
-              retVal.push({"url": JSON.parse(response)[r], "uuid": srInfo.uuid, 'name': srInfo.name_label});
+              try {
+                resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+                srInfo = JSON.parse(resp);
+                retVal.push({"url": JSON.parse(response)[r], "uuid": srInfo.uuid, 'name': srInfo.name_label});
+              } catch(error) {
+                 Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/srs Error: " + error);
+                 if (!Number.isInteger(error))
+                   return 520;
+              }
             }
             return JSON.stringify(retVal);
           lifetime: 1d
@@ -1021,9 +1039,15 @@ zabbix_export:
             }
             var retVal = []
             for (r=0; r < JSON.parse(response).length; r++) {
-              resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
-              vmsInfo = JSON.parse(resp);
-              retVal.push({"url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label});
+              try {
+                resp = req.get(encodeURI(params.url + JSON.parse(response)[r]));
+                vmsInfo = JSON.parse(resp);
+                retVal.push({"url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label});
+              } catch(error) {
+                 Zabbix.log(3, "XenOrchestra API failes" + params.url + "/rest/v0/vms Error: " + error);
+                 if (!Number.isInteger(error))
+                   return 520;
+              }
             }
             return JSON.stringify(retVal);
           lifetime: 1d
