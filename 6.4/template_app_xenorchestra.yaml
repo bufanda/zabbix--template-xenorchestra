@@ -1149,3 +1149,10 @@ zabbix_export:
               newvalue: 'true'
             - value: '0'
               newvalue: 'false'
+  triggers:
+    - uuid: 728078ed899548faa3736110abb9d69e
+      expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=401'
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=200'
+      name: 'Authentication Token for XenOrchestra is invalid'
+      priority: HIGH

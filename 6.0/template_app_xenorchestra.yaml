@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-02-08T12:35:40Z'
+  date: '2024-02-08T12:41:55Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -1149,3 +1149,10 @@ zabbix_export:
               newvalue: 'true'
             - value: '0'
               newvalue: 'false'
+  triggers:
+    - uuid: 728078ed899548faa3736110abb9d69e
+      expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=401'
+      recovery_mode: RECOVERY_EXPRESSION
+      recovery_expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=200'
+      name: 'Authentication Token for XenOrchestra is invalid'
+      priority: HIGH
