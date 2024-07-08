@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-04-12T07:47:42Z'
+  date: '2024-07-08T20:38:06Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -654,6 +654,8 @@ zabbix_export:
               delay: 15m
               history: 1d
               trends: '0'
+              status: DISABLED
+              discover: NO_DISCOVER
               value_type: TEXT
               params: |
                 try {
@@ -806,7 +808,7 @@ zabbix_export:
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
             - uuid: f6d83eef5fd9449d97ac649bb0f6e40e
-              name: 'Pool{#POOL.NAME} ({#POOL.UUID}): CPU Sockets'
+              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): CPU Sockets'
               type: DEPENDENT
               key: 'xoa.pool.cpu.sockets[{#POOL.URL}]'
               delay: '0'
@@ -917,6 +919,12 @@ zabbix_export:
               }
             }
             return JSON.stringify(retVal);
+          filter:
+            conditions:
+              - macro: '{#SR.NAME}'
+                value: '{$XEN.SR.IGNORE}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
           lifetime: 1d
           item_prototypes:
             - uuid: 2c7ddde760c7485fbfd5afd06c0ca9f6
@@ -1059,6 +1067,9 @@ zabbix_export:
             try {
             var params = JSON.parse(value);
             var req = new HttpRequest();
+            if (params.proxy != "CHANGE_IF_NEEDED") {
+              req.setProxy(params.proxy)
+            }
             req.addHeader('Cookie: authenticationToken=' + params.token);
             var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
             var response = req.get(encodeURI(server_url + '/rest/v0/vms'));
@@ -1103,6 +1114,8 @@ zabbix_export:
                 - tag: target
                   value: guest
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -1135,9 +1148,15 @@ zabbix_export:
         - tag: target
           value: xen
       macros:
+        - macro: '{$XEN.SR.IGNORE}'
+          value: '^(DVD drives|XCP-ng Tools|Removable storage)$'
+          description: 'Do not discover following SRs'
         - macro: '{$XOA.AUTH.TOKEN}'
           value: CHANGE_IF_NEEDED
           description: 'Authentication Token generated on XOA UI'
+        - macro: '{$XOA.PROXY.URL}'
+          value: CHANGE_IF_NEEDED
+          description: 'URL for a Proxy if used to reach XOA'
         - macro: '{$XOA.SR.THRESHOLD.CRIT}'
           value: '95'
           description: 'Critical threshold for SR usage'
