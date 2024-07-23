@@ -578,6 +578,9 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/backup/jobs/vm'));
@@ -609,6 +612,9 @@ zabbix_export:
                 try {
                     var params = JSON.parse(value);
                     var req = new HttpRequest();
+                    if (params.proxy != "CHANGE_IF_NEEDED") {
+                      req.setProxy(params.proxy)
+                    }
                     req.addHeader('Cookie: authenticationToken=' + params.token);
                     var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                     var response = req.get(encodeURI(server_url + '/rest/v0/backup/logs'));
@@ -633,6 +639,8 @@ zabbix_export:
                 return JSON.stringify(retVal[0]);
               timeout: 60s
               parameters:
+                - name: proxy
+                  value: '{$XOA.PROXY.URL}'
                 - name: token
                   value: '{$XOA.AUTH.TOKEN}'
                 - name: url
@@ -640,6 +648,8 @@ zabbix_export:
                 - name: uuid
                   value: '{#BACKUP.UUID}'
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -660,6 +670,9 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/hosts'));
@@ -678,7 +691,7 @@ zabbix_export:
                 } catch (error) {
                     Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/hosts Error: " + error);
                     if (!Number.isInteger(error)) {
-                        return 500;
+                        return 520;
                     }
                 }
             }
@@ -706,6 +719,8 @@ zabbix_export:
                 - tag: target
                   value: XCP-NG
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -726,6 +741,9 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/pools'));
@@ -824,6 +842,8 @@ zabbix_export:
                 - name: Accept
                   value: application/json
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -844,6 +864,9 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/srs'));
@@ -984,6 +1007,8 @@ zabbix_export:
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url

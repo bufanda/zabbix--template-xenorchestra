@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-07-08T20:38:06Z'
+  date: '2024-07-23T06:26:57Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -630,13 +630,17 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/backup/jobs/vm'));
             } catch (error) {
                 Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/backup/jobs/vm Error: " + error);
-                if (!Number.isInteger(error))
+                if (!Number.isInteger(error)) {
                     return 520;
+                }
             }
             var retVal = []
             for (r = 0; r < JSON.parse(response).length; r++) {
@@ -661,27 +665,35 @@ zabbix_export:
                 try {
                     var params = JSON.parse(value);
                     var req = new HttpRequest();
+                    if (params.proxy != "CHANGE_IF_NEEDED") {
+                      req.setProxy(params.proxy)
+                    }
                     req.addHeader('Cookie: authenticationToken=' + params.token);
                     var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                     var response = req.get(encodeURI(server_url + '/rest/v0/backup/logs'));
                 } catch (error) {
                     Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/backup/logs Error: " + error);
-                    if (!Number.isInteger(error))
+                    if (!Number.isInteger(error)) {
                         return 520;
+                    }
                 }
                 var retVal = []
                 for (r = 0; r < JSON.parse(response).length; r++) {
                     resp = req.get(encodeURI(server_url + JSON.parse(response)[r]));
                     backupLog = JSON.parse(resp);
-                    if (backupLog.jobID == params.uuid && backupLog.status != 'pending')
+                    if (backupLog.jobID == params.uuid && backupLog.status != 'pending') {
                         retVal.push({ "url": JSON.parse(response)[r], "id": backupLog.id, 'name': backupLog.jobName, 'status': backupLog.status, 'start': backupLog.start, 'end': backupLog.end });
-                    else
+                    }
+                    else {
                         retVal.push({ "url": JSON.parse(response)[r], "id": backupLog.id, 'name': backupLog.jobName, 'status': backupLog.status, 'start': backupLog.start });
+                    }
                     retVal.reverse(function (a, b) { return a.start - b.start });
                 }
                 return JSON.stringify(retVal[0]);
               timeout: 60s
               parameters:
+                - name: proxy
+                  value: '{$XOA.PROXY.URL}'
                 - name: token
                   value: '{$XOA.AUTH.TOKEN}'
                 - name: url
@@ -689,6 +701,8 @@ zabbix_export:
                 - name: uuid
                   value: '{#BACKUP.UUID}'
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -709,13 +723,17 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/hosts'));
             } catch (error) {
                 Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/hosts Error: " + error);
-                if (!Number.isInteger(error))
+                if (!Number.isInteger(error)) {
                     return 520;
+                }
             }
             var retVal = []
             for (r = 0; r < JSON.parse(response).length; r++) {
@@ -725,8 +743,9 @@ zabbix_export:
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": hostInfo.uuid, 'name': hostInfo.name_label });
                 } catch (error) {
                     Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/hosts Error: " + error);
-                    if (!Number.isInteger(error))
-                        return 500;
+                    if (!Number.isInteger(error)) {
+                        return 520;
+                    }
                 }
             }
             return JSON.stringify(retVal);
@@ -753,6 +772,8 @@ zabbix_export:
                 - tag: target
                   value: XCP-NG
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -773,13 +794,17 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/pools'));
             } catch (error) {
                 Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/pools Error: " + error);
-                if (!Number.isInteger(error))
+                if (!Number.isInteger(error)) {
                     return 520;
+                }
             }
             var retVal = []
             for (r = 0; r < JSON.parse(response).length; r++) {
@@ -789,8 +814,9 @@ zabbix_export:
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": poolInfo.uuid, 'name': poolInfo.name_label });
                 } catch (error) {
                     Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/pools Error: " + error);
-                    if (!Number.isInteger(error))
+                    if (!Number.isInteger(error)) {
                         return 520;
+                    }
                 }
             }
             return JSON.stringify(retVal);
@@ -878,6 +904,8 @@ zabbix_export:
                 - name: Accept
                   value: application/json
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -898,13 +926,17 @@ zabbix_export:
             try {
                 var params = JSON.parse(value);
                 var req = new HttpRequest();
+                if (params.proxy != "CHANGE_IF_NEEDED") {
+                  req.setProxy(params.proxy)
+                }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/srs'));
             } catch (error) {
                 Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/srs Error: " + error);
-                if (!Number.isInteger(error))
+                if (!Number.isInteger(error)) {
                     return 520;
+                }
             }
             var retVal = []
             for (r = 0; r < JSON.parse(response).length; r++) {
@@ -914,8 +946,9 @@ zabbix_export:
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": srInfo.uuid, 'name': srInfo.name_label });
                 } catch (error) {
                     Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/srs Error: " + error);
-                    if (!Number.isInteger(error))
+                    if (!Number.isInteger(error)) {
                         return 520;
+                    }
                 }
             }
             return JSON.stringify(retVal);
@@ -1047,6 +1080,8 @@ zabbix_export:
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
           parameters:
+            - name: proxy
+              value: '{$XOA.PROXY.URL}'
             - name: token
               value: '{$XOA.AUTH.TOKEN}'
             - name: url
@@ -1075,8 +1110,9 @@ zabbix_export:
                 var response = req.get(encodeURI(server_url + '/rest/v0/vms'));
             } catch (error) {
                 Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/vms Error: " + error);
-                if (!Number.isInteger(error))
+                if (!Number.isInteger(error)) {
                     return 520;
+                }
             }
             var retVal = []
             for (r = 0; r < JSON.parse(response).length; r++) {
@@ -1086,8 +1122,9 @@ zabbix_export:
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label });
                 } catch (error) {
                     Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/vms Error: " + error);
-                    if (!Number.isInteger(error))
+                    if (!Number.isInteger(error)) {
                         return 520;
+                    }
                 }
             }
             return JSON.stringify(retVal);
