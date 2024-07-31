@@ -18,6 +18,10 @@ This template has been tested on:
 - Zabbix 6.0
 - Zabbix 6.4
 
+!! ATTENTION !!
+
+The Zabbix 7.0 Template isn't working yet some strange behavior in HttpRequest Library of Zabbix is causing issues atm.
+
 ## Author
 
 Thorsten Liepert
