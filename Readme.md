@@ -20,7 +20,7 @@ This template has been tested on:
 
 !! ATTENTION !!
 
-The Zabbix 7.0 Template isn't working yet some strange behavior in HttpRequest Library of Zabbix is causing issues atm.
+The Zabbix 7.0 Template isn't working/tested yet there is an [issue](https://support.zabbix.com/browse/ZBX-24926) with Zabbix and certain curl libraries.
 
 ## Author
 
