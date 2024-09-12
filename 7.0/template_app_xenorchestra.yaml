@@ -19,6 +19,7 @@ zabbix_export:
           name: 'CPU Cores'
           type: DEPENDENT
           key: xoa.host.cpu.cores
+          delay: '0'
           history: 90d
           preprocessing:
             - type: JSONPATH
@@ -30,6 +31,7 @@ zabbix_export:
           name: 'CPU Sockets'
           type: DEPENDENT
           key: xoa.host.cpu.sockets
+          delay: '0'
           history: 90d
           preprocessing:
             - type: JSONPATH
@@ -41,8 +43,10 @@ zabbix_export:
           name: 'Host description'
           type: DEPENDENT
           key: xoa.host.description
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -56,8 +60,10 @@ zabbix_export:
           name: Enabled
           type: DEPENDENT
           key: xoa.host.enabled
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -68,8 +74,10 @@ zabbix_export:
           name: 'Hypervisor brand'
           type: DEPENDENT
           key: xoa.host.hv.brand
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -83,8 +91,10 @@ zabbix_export:
           name: 'Hypervisor version'
           type: DEPENDENT
           key: xoa.host.hv.version
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -98,8 +108,10 @@ zabbix_export:
           name: 'Hypervisor version build'
           type: DEPENDENT
           key: xoa.host.hv.version.build
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -113,8 +125,10 @@ zabbix_export:
           name: 'HVM capable'
           type: DEPENDENT
           key: xoa.host.hvm.capabale
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -128,6 +142,7 @@ zabbix_export:
           name: 'Memory total'
           type: DEPENDENT
           key: xoa.host.memory.total
+          delay: '0'
           history: 90d
           units: B
           preprocessing:
@@ -140,6 +155,7 @@ zabbix_export:
           name: 'Memory used'
           type: DEPENDENT
           key: xoa.host.memory.used
+          delay: '0'
           history: 90d
           units: B
           preprocessing:
@@ -176,6 +192,7 @@ zabbix_export:
           delay: 15m
           history: '0'
           value_type: TEXT
+          trends: '0'
           url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}/missing_patches'
           headers:
             - name: Cookie
@@ -186,8 +203,10 @@ zabbix_export:
           name: Hostname
           type: DEPENDENT
           key: xoa.host.name
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -201,8 +220,10 @@ zabbix_export:
           name: 'Power State'
           type: DEPENDENT
           key: xoa.host.power.state
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -223,6 +244,7 @@ zabbix_export:
           delay: 5m
           history: '0'
           value_type: TEXT
+          trends: '0'
           url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}'
           headers:
             - name: Cookie
@@ -233,8 +255,10 @@ zabbix_export:
           name: 'Reboot required'
           type: DEPENDENT
           key: xoa.host.reboot.required
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -250,6 +274,7 @@ zabbix_export:
           name: 'Number of running VMs'
           type: DEPENDENT
           key: xoa.host.runningvms
+          delay: '0'
           history: 90d
           preprocessing:
             - type: JSONPATH
@@ -264,6 +289,7 @@ zabbix_export:
           name: 'Host start time'
           type: DEPENDENT
           key: xoa.host.starttime
+          delay: '0'
           history: 90d
           units: unixtime
           preprocessing:
@@ -279,6 +305,7 @@ zabbix_export:
           name: 'Number of Missing Patches'
           type: DEPENDENT
           key: xoa.hosts.missingpatches.count
+          delay: '0'
           history: 90d
           preprocessing:
             - type: JAVASCRIPT
@@ -333,6 +360,7 @@ zabbix_export:
           name: 'vCPU active'
           type: DEPENDENT
           key: xoa.vm.cpu.active
+          delay: '0'
           history: 90d
           preprocessing:
             - type: JSONPATH
@@ -344,6 +372,7 @@ zabbix_export:
           name: 'vCPU max'
           type: DEPENDENT
           key: xoa.vm.cpu.max
+          delay: '0'
           history: 90d
           preprocessing:
             - type: JSONPATH
@@ -355,8 +384,10 @@ zabbix_export:
           name: 'VM description'
           type: DEPENDENT
           key: xoa.vm.description
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -370,8 +401,10 @@ zabbix_export:
           name: 'Xen PV driver version'
           type: DEPENDENT
           key: xoa.vm.driver.version
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -385,6 +418,7 @@ zabbix_export:
           name: 'VM install time'
           type: DEPENDENT
           key: xoa.vm.installtime
+          delay: '0'
           history: 90d
           units: unixtime
           preprocessing:
@@ -400,8 +434,10 @@ zabbix_export:
           name: 'Management agent detected'
           type: DEPENDENT
           key: xoa.vm.management.agent
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -418,6 +454,7 @@ zabbix_export:
           name: 'Memory total'
           type: DEPENDENT
           key: xoa.vm.memory.total
+          delay: '0'
           history: 90d
           units: B
           preprocessing:
@@ -430,8 +467,10 @@ zabbix_export:
           name: 'Virtualization mode'
           type: DEPENDENT
           key: xoa.vm.mode
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -445,8 +484,10 @@ zabbix_export:
           name: 'VM name'
           type: DEPENDENT
           key: xoa.vm.name
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -460,8 +501,10 @@ zabbix_export:
           name: 'OS Distribution'
           type: DEPENDENT
           key: xoa.vm.os.distro
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -475,8 +518,10 @@ zabbix_export:
           name: 'OS version'
           type: DEPENDENT
           key: xoa.vm.os.version
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -490,8 +535,10 @@ zabbix_export:
           name: 'Power State'
           type: DEPENDENT
           key: xoa.vm.power.state
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -509,6 +556,7 @@ zabbix_export:
           name: 'Number of snapshots'
           type: DEPENDENT
           key: xoa.vm.snapshot
+          delay: '0'
           history: 90d
           preprocessing:
             - type: JSONPATH
@@ -528,6 +576,7 @@ zabbix_export:
           name: 'VM start time'
           type: DEPENDENT
           key: xoa.vm.starttime
+          delay: '0'
           history: 90d
           units: unixtime
           preprocessing:
@@ -543,8 +592,10 @@ zabbix_export:
           name: 'Xen Tool Version'
           type: DEPENDENT
           key: xoa.vm.tools.version
+          delay: '0'
           history: 90d
           value_type: CHAR
+          trends: '0'
           preprocessing:
             - type: JSONPATH
               parameters:
@@ -561,6 +612,7 @@ zabbix_export:
           delay: 5m
           history: '0'
           value_type: TEXT
+          trends: '0'
           url: '{$XOA.URL}/rest/v0/vms/{$XOA.VM.UUID}'
           headers:
             - name: Cookie
@@ -639,6 +691,7 @@ zabbix_export:
               delay: 15m
               history: 1d
               value_type: TEXT
+              trends: '0'
               status: DISABLED
               discover: NO_DISCOVER
               params: |
@@ -808,6 +861,7 @@ zabbix_export:
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): CPU Cores'
               type: DEPENDENT
               key: 'xoa.pool.cpu.cores[{#POOL.URL}]'
+              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -818,6 +872,7 @@ zabbix_export:
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): CPU Sockets'
               type: DEPENDENT
               key: 'xoa.pool.cpu.sockets[{#POOL.URL}]'
+              delay: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -828,7 +883,9 @@ zabbix_export:
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Descriptipn'
               type: DEPENDENT
               key: 'xoa.pool.description[{#POOL.URL}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -842,7 +899,9 @@ zabbix_export:
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): HA enabled'
               type: DEPENDENT
               key: 'xoa.pool.ha.enabled[{#POOL.URL}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -853,7 +912,9 @@ zabbix_export:
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Name'
               type: DEPENDENT
               key: 'xoa.pool.name[{#POOL.URL}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -870,6 +931,7 @@ zabbix_export:
               delay: 15m
               history: '0'
               value_type: TEXT
+              trends: '0'
               url: '{$XOA.URL}{#POOL.URL}'
               headers:
                 - name: Cookie
@@ -930,6 +992,7 @@ zabbix_export:
               - macro: '{#SR.NAME}'
                 value: '{$XEN.SR.IGNORE}'
                 operator: NOT_MATCHES_REGEX
+                formulaid: A
           lifetime: 1d
           enabled_lifetime_type: DISABLE_NEVER
           item_prototypes:
@@ -937,7 +1000,9 @@ zabbix_export:
               name: 'SR {#SR.NAME} ({#SR.UUID}): In maintenance mode'
               type: DEPENDENT
               key: 'xoa.sr.maintenance[{#SR.URL}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -948,7 +1013,9 @@ zabbix_export:
               name: 'SR {#SR.NAME} ({#SR.UUID}): Name'
               type: DEPENDENT
               key: 'xoa.sr.name[{#SR.URL}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -965,6 +1032,7 @@ zabbix_export:
               delay: 5m
               history: '0'
               value_type: TEXT
+              trends: '0'
               url: '{$XOA.URL}{#SR.URL}'
               headers:
                 - name: Cookie
@@ -975,6 +1043,7 @@ zabbix_export:
               name: 'SR {#SR.NAME} ({#SR.UUID}): Size'
               type: DEPENDENT
               key: 'xoa.sr.size[{#SR.URL}]'
+              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -986,7 +1055,9 @@ zabbix_export:
               name: 'SR {#SR.NAME} ({#SR.UUID}) Content Type'
               type: DEPENDENT
               key: 'xoa.sr.type.content[{#SR.URL}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1000,7 +1071,9 @@ zabbix_export:
               name: 'SR {#SR.NAME} ({#SR.UUID}): Type'
               type: DEPENDENT
               key: 'xoa.sr.type[{#SR.URL}]'
+              delay: '0'
               value_type: CHAR
+              trends: '0'
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1034,6 +1107,7 @@ zabbix_export:
               name: 'SR {#SR.NAME} ({#SR.UUID}): Physical Usage'
               type: DEPENDENT
               key: 'xoa.sr.used.physical[{#SR.URL}]'
+              delay: '0'
               units: B
               preprocessing:
                 - type: JSONPATH
