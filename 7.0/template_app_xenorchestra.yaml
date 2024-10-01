@@ -698,31 +698,48 @@ zabbix_export:
                 try {
                     var params = JSON.parse(value);
                     var req = new HttpRequest();
-                    if (params.proxy != "CHANGE_IF_NEEDED") {
-                      req.setProxy(params.proxy)
+                    req.addHeader("Cookie: authenticationToken=" + params.token);
+                    var server_url = params.url.endsWith("/") ? params.url.slice(0, -1) : params.url;
+                    var response = req.get(encodeURI(server_url + "/rest/v0/backup/logs?filter=jobId:" + params.uuid));
+                    if (!response) {
+                        Zabbix.log(3, "XenOrchestra API Error: Empty response for URL " + server_url + "/rest/v0/backup/logs?filter=jobId:" + params.uuid);
+                        return 501;
                     }
-                    req.addHeader('Cookie: authenticationToken=' + params.token);
-                    var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
-                    var response = req.get(encodeURI(server_url + '/rest/v0/backup/logs'));
+                    var backupLogUrls = JSON.parse(response);
+                    if (backupLogUrls.length === 0) {
+                        Zabbix.log(3, "XenOrchestra API Error: No backup logs found for job Id " + params.uuid);
+                        return 502;
+                    }
                 } catch (error) {
-                    Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/backup/logs Error: " + error);
-                    if (!Number.isInteger(error)) {
-                        return 520;
-                    }
+                    Zabbix.log(3, "XenOrchestra API Error: " + error);
+                    return 503;
                 }
-                var retVal = []
-                for (r = 0; r < JSON.parse(response).length; r++) {
-                    resp = req.get(encodeURI(server_url + JSON.parse(response)[r]));
-                    backupLog = JSON.parse(resp);
-                    if (backupLog.jobID == params.uuid && backupLog.status != 'pending') {
-                        retVal.push({ "url": JSON.parse(response)[r], "id": backupLog.id, 'name': backupLog.jobName, 'status': backupLog.status, 'start': backupLog.start, 'end': backupLog.end });
+                
+                try {
+                    var logUrl = backupLogUrls[backupLogUrls.length - 1];
+                    var resp = req.get(encodeURI(server_url + logUrl));
+                    if (!resp) {
+                        Zabbix.log(3, "XenOrchestra API Error: Empty response for log URL " + logUrl);
+                        return 504;
                     }
-                    else {
-                        retVal.push({ "url": JSON.parse(response)[r], "id": backupLog.id, 'name': backupLog.jobName, 'status': backupLog.status, 'start': backupLog.start });
+                    var backupLog = JSON.parse(resp);
+                    backupLog.url = logUrl;
+                    if (backupLog.jobId === params.uuid) {
+                        return JSON.stringify({
+                            "url": backupLog.url,
+                            "params": params.uuid,
+                            "id": backupLog.id,
+                            "name": backupLog.jobName,
+                            "status": backupLog.status,
+                            "start": backupLog.start,
+                            "end": backupLog.end
+                        });
                     }
-                    retVal.reverse(function (a, b) { return a.start - b.start });
+                    return 505;
+                } catch (error) {
+                    Zabbix.log(3, "XenOrchestra API Error: " + error);
+                    return 506;
                 }
-                return JSON.stringify(retVal[0]);
               timeout: 60s
               parameters:
                 - name: proxy
