@@ -20,7 +20,10 @@ This template has been tested on:
 
 !! ATTENTION !!
 
-The Zabbix 7.0 Template isn't working/tested yet there is an [issue](https://support.zabbix.com/browse/ZBX-24926) with Zabbix and certain curl libraries.
+Due to the [issue](https://support.zabbix.com/browse/ZBX-24926) with Zabbix 7.0 
+make sure to have the right cURL version installed. 
+
+The container for zabbix 7.0.4 seems to be working ok.
 
 ## Author
 
