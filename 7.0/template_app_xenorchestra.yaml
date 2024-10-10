@@ -569,8 +569,8 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 353d88c34edc4ea3957a4ecc12e6db7b
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.snapshot)>{$XOA.VM.NO.SNAPSHOTS.MAX}'
-              name: 'Number of Snapshots exceeds {$XOA.VM.NO.SNAPSHOTS.MAX}'
+              expression: 'min(/XCP-NG VM via Xen Orchestra/xoa.vm.snapshot,3600)>{$XOA.VM.NO.SNAPSHOTS.MAX}'
+              name: 'Number of Snapshots exceeds {$XOA.VM.NO.SNAPSHOTS.MAX} for more than 1 hour'
               priority: WARNING
         - uuid: 889bc4bcaf0744f7ac14c36f45139cc8
           name: 'VM start time'
