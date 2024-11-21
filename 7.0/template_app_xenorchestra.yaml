@@ -694,6 +694,7 @@ zabbix_export:
               type: CALCULATED
               key: 'xoa.backup.vm.duration[{#BACKUP.UUID}]'
               delay: 15m
+              units: uptime
               params: '(last(//xoa.backup.vm.end[{#BACKUP.UUID}])-last(//xoa.backup.vm.start[{#BACKUP.UUID}]))'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT

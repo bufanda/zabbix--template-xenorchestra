@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-11-21T14:13:52Z'
+  date: '2024-11-21T14:21:01Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -661,6 +661,7 @@ zabbix_export:
               type: CALCULATED
               key: 'xoa.backup.vm.duration[{#BACKUP.UUID}]'
               delay: 15m
+              units: uptime
               params: '(last(//xoa.backup.vm.end[{#BACKUP.UUID}])-last(//xoa.backup.vm.start[{#BACKUP.UUID}]))'
               preprocessing:
                 - type: DISCARD_UNCHANGED_HEARTBEAT
