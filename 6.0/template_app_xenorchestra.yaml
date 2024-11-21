@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-11-21T13:27:46Z'
+  date: '2024-11-21T14:13:52Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -656,6 +656,21 @@ zabbix_export:
                 formulaid: A
           lifetime: 1d
           item_prototypes:
+            - uuid: b9baccd3b3f24ae9bb58387dfc164b05
+              name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup duration'
+              type: CALCULATED
+              key: 'xoa.backup.vm.duration[{#BACKUP.UUID}]'
+              delay: 15m
+              params: '(last(//xoa.backup.vm.end[{#BACKUP.UUID}])-last(//xoa.backup.vm.start[{#BACKUP.UUID}]))'
+              preprocessing:
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
+              tags:
+                - tag: component
+                  value: backup
+                - tag: target
+                  value: vm
             - uuid: d65c320702cc4d1cac28aa7c8597c1bf
               name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup end'
               type: DEPENDENT
@@ -949,6 +964,11 @@ zabbix_export:
                     - $.cpus.cores
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
+              tags:
+                - tag: component
+                  value: pool
+                - tag: pool
+                  value: '{#POOL.NAME}'
             - uuid: f6d83eef5fd9449d97ac649bb0f6e40e
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): CPU Sockets'
               type: DEPENDENT
@@ -960,6 +980,11 @@ zabbix_export:
                     - $.cpus.sockets
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
+              tags:
+                - tag: component
+                  value: pool
+                - tag: pool
+                  value: '{#POOL.NAME}'
             - uuid: 46a2c37e887a44af831a95b2962ee8c4
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Descriptipn'
               type: DEPENDENT
@@ -976,6 +1001,11 @@ zabbix_export:
                     - 12h
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
+              tags:
+                - tag: component
+                  value: pool
+                - tag: pool
+                  value: '{#POOL.NAME}'
             - uuid: 64981b8e1f7f49e7a4941ab0866df905
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): HA enabled'
               type: DEPENDENT
@@ -989,6 +1019,11 @@ zabbix_export:
                     - $.HA_enabled
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
+              tags:
+                - tag: component
+                  value: pool
+                - tag: pool
+                  value: '{#POOL.NAME}'
             - uuid: bb14638e591940389e2ee1b437fa428f
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Name'
               type: DEPENDENT
@@ -1005,6 +1040,11 @@ zabbix_export:
                     - 6h
               master_item:
                 key: 'xoa.pool[{#POOL.URL}]'
+              tags:
+                - tag: component
+                  value: pool
+                - tag: pool
+                  value: '{#POOL.NAME}'
             - uuid: d119af9ee0794efa9c5a93ef01301a1a
               name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Get Values'
               type: HTTP_AGENT
@@ -1019,6 +1059,9 @@ zabbix_export:
                   value: 'authenticationToken={$XOA.AUTH.TOKEN}'
                 - name: Accept
                   value: application/json
+              tags:
+                - tag: component
+                  value: raw
           parameters:
             - name: proxy
               value: '{$XOA.PROXY.URL}'
@@ -1089,6 +1132,11 @@ zabbix_export:
                     - $.inMaintenanceMode
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: repository
+                  value: '{#SR.NAME}'
             - uuid: ac01c8b01494403797fbdf84657ecbc1
               name: 'SR {#SR.NAME} ({#SR.UUID}): Name'
               type: DEPENDENT
@@ -1105,6 +1153,11 @@ zabbix_export:
                     - 12h
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: repository
+                  value: '{#SR.NAME}'
             - uuid: a9c8007dfb15454da2ec7d3b2ef78c36
               name: 'SR {#SR.NAME} ({#SR.UUID}): Get Values'
               type: HTTP_AGENT
@@ -1119,6 +1172,9 @@ zabbix_export:
                   value: 'authenticationToken={$XOA.AUTH.TOKEN}'
                 - name: Accept
                   value: application/json
+              tags:
+                - tag: component
+                  value: raw
             - uuid: c3d42712ef4c4941b5d6dcf301abd4f5
               name: 'SR {#SR.NAME} ({#SR.UUID}): Size'
               type: DEPENDENT
@@ -1131,6 +1187,11 @@ zabbix_export:
                     - $.size
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: repository
+                  value: '{#SR.NAME}'
             - uuid: 5c9753ddfd4040a4b2f09bee5b218f37
               name: 'SR {#SR.NAME} ({#SR.UUID}) Content Type'
               type: DEPENDENT
@@ -1147,6 +1208,11 @@ zabbix_export:
                     - 6h
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: repository
+                  value: '{#SR.NAME}'
             - uuid: 09c0b4829e674fbaa3b80ce030f311f3
               name: 'SR {#SR.NAME} ({#SR.UUID}): Type'
               type: DEPENDENT
@@ -1163,6 +1229,11 @@ zabbix_export:
                     - 6h
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: repository
+                  value: '{#SR.NAME}'
             - uuid: 3f678af9e8fc4c0dbfab055155749c2c
               name: 'SR {#SR.NAME} ({#SR.UUID}): Used percentage'
               type: CALCULATED
@@ -1171,11 +1242,19 @@ zabbix_export:
               value_type: FLOAT
               units: '%'
               params: 'last(//xoa.sr.used.physical[{#SR.URL}])/last(//xoa.sr.size[{#SR.URL}])*100'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: repository
+                  value: '{#SR.NAME}'
               trigger_prototypes:
                 - uuid: fb16b143e0ef45ea91eb423f2530cdd0
                   expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
                   name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is critical low'
                   priority: HIGH
+                  tags:
+                    - tag: scope
+                      value: storage
                 - uuid: 087dcb24233f4f3c8a88bc7d01abe3a4
                   expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.WARN}'
                   name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is low'
@@ -1183,6 +1262,9 @@ zabbix_export:
                   dependencies:
                     - name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is critical low'
                       expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
+                  tags:
+                    - tag: scope
+                      value: storage
             - uuid: 57b22801aba547bfa90a3304a59f53dc
               name: 'SR {#SR.NAME} ({#SR.UUID}): Physical Usage'
               type: DEPENDENT
@@ -1195,6 +1277,11 @@ zabbix_export:
                     - $.physical_usage
               master_item:
                 key: 'xoa.sr.raw[{#SR.URL}]'
+              tags:
+                - tag: component
+                  value: storage
+                - tag: repository
+                  value: '{#SR.NAME}'
           parameters:
             - name: proxy
               value: '{$XOA.PROXY.URL}'
