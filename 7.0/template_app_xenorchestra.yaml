@@ -686,7 +686,7 @@ zabbix_export:
             - uuid: 4ca54def98724bbbaa6d4e101c5a7aa4
               name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup Name'
               type: DEPENDENT
-              key: 'xoa.back.vm.name[{#BACKUP.UUID}]'
+              key: 'xoa.backup.vm.name[{#BACKUP.UUID}]'
               delay: '0'
               value_type: TEXT
               trends: '0'
@@ -699,7 +699,7 @@ zabbix_export:
             - uuid: 1e36a34c950f4afbac07f89fb1d0cc17
               name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup start'
               type: DEPENDENT
-              key: 'xoa.back.vm.start[{#BACKUP.UUID}]'
+              key: 'xoa.backup.vm.start[{#BACKUP.UUID}]'
               delay: '0'
               units: unixtime
               preprocessing:
@@ -711,7 +711,7 @@ zabbix_export:
             - uuid: 880ff365a84c4b0e8cbb807655e0b70f
               name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup Status'
               type: DEPENDENT
-              key: 'xoa.back.vm.status[{#BACKUP.UUID}]'
+              key: 'xoa.backup.vm.status[{#BACKUP.UUID}]'
               delay: '0'
               value_type: TEXT
               trends: '0'
@@ -724,7 +724,7 @@ zabbix_export:
             - uuid: d65c320702cc4d1cac28aa7c8597c1bf
               name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup stop'
               type: DEPENDENT
-              key: 'xoa.back.vm.stop[{#BACKUP.UUID}]'
+              key: 'xoa.backup.vm.stop[{#BACKUP.UUID}]'
               delay: '0'
               units: unixtime
               preprocessing:
