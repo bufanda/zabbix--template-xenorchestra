@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-10-01T08:44:40Z'
+  date: '2024-11-21T11:46:02Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -621,11 +621,10 @@ zabbix_export:
         - name: Templates
       discovery_rules:
         - uuid: 4f543445aeb1465ebb10fe09d895c661
-          name: 'Discovery Backups'
+          name: 'Discovery Backups VM'
           type: SCRIPT
           key: xoa.backup.discovery
           delay: 1h
-          status: DISABLED
           params: |
             try {
                 var params = JSON.parse(value);
@@ -651,15 +650,63 @@ zabbix_export:
             return JSON.stringify(retVal);
           lifetime: 1d
           item_prototypes:
-            - uuid: b16275be3b5741d9b199b3965856c86f
-              name: 'Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Get job status'
-              type: SCRIPT
-              key: 'xoa.backup.raw[{#BACKUP.UUID}]'
-              delay: 15m
-              history: 1d
+            - uuid: 4ca54def98724bbbaa6d4e101c5a7aa4
+              name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup Name'
+              type: DEPENDENT
+              key: 'xoa.back.vm.name[{#BACKUP.UUID}]'
+              delay: '0'
               trends: '0'
-              status: DISABLED
-              discover: NO_DISCOVER
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.name
+              master_item:
+                key: 'xoa.backup.vm.raw[{#BACKUP.UUID}]'
+            - uuid: 1e36a34c950f4afbac07f89fb1d0cc17
+              name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup start'
+              type: DEPENDENT
+              key: 'xoa.back.vm.start[{#BACKUP.UUID}]'
+              delay: '0'
+              units: unixtime
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.start
+              master_item:
+                key: 'xoa.backup.vm.raw[{#BACKUP.UUID}]'
+            - uuid: 880ff365a84c4b0e8cbb807655e0b70f
+              name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup Status'
+              type: DEPENDENT
+              key: 'xoa.back.vm.status[{#BACKUP.UUID}]'
+              delay: '0'
+              trends: '0'
+              value_type: TEXT
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.status
+              master_item:
+                key: 'xoa.backup.vm.raw[{#BACKUP.UUID}]'
+            - uuid: d65c320702cc4d1cac28aa7c8597c1bf
+              name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Backup stop'
+              type: DEPENDENT
+              key: 'xoa.back.vm.stop[{#BACKUP.UUID}]'
+              delay: '0'
+              units: unixtime
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - $.stop
+              master_item:
+                key: 'xoa.backup.vm.raw[{#BACKUP.UUID}]'
+            - uuid: b16275be3b5741d9b199b3965856c86f
+              name: 'VM Backup {#BACKUP.NAME} ({#BACKUP.UUID}): Get job status'
+              type: SCRIPT
+              key: 'xoa.backup.vm.raw[{#BACKUP.UUID}]'
+              delay: 15m
+              history: '0'
+              trends: '0'
               value_type: TEXT
               params: |
                 try {
