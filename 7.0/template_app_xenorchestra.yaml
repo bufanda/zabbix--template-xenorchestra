@@ -775,7 +775,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-                
+
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));
@@ -850,6 +850,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.status
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'xoa.backup.vm.raw[{#BACKUP.UUID}]'
               tags:
@@ -859,7 +862,7 @@ zabbix_export:
                   value: vm
               trigger_prototypes:
                 - uuid: b7a1d34be70b45688df8d48d018d06eb
-                  expression: 'last(/Xen Orchestra by HTTP/xoa.backup.vm.status[{#BACKUP.UUID}])<>"success"'
+                  expression: 'last(/Xen Orchestra by HTTP/xoa.backup.vm.status[{#BACKUP.UUID}])="failed"'
                   name: 'VM Backup {#BACKUP.NAME} has bad status'
                   priority: AVERAGE
                   tags:
