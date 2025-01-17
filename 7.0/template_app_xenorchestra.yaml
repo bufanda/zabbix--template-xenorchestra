@@ -193,6 +193,7 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           trends: '0'
+          timeout: 3s
           url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}/missing_patches'
           headers:
             - name: Cookie
@@ -245,6 +246,7 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           trends: '0'
+          timeout: 3s
           url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}'
           headers:
             - name: Cookie
@@ -296,6 +298,10 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.startTime
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
@@ -613,6 +619,7 @@ zabbix_export:
           history: '0'
           value_type: TEXT
           trends: '0'
+          timeout: 3s
           url: '{$XOA.URL}/rest/v0/vms/{$XOA.VM.UUID}'
           headers:
             - name: Cookie
@@ -694,6 +701,7 @@ zabbix_export:
               type: CALCULATED
               key: 'xoa.backup.vm.duration[{#BACKUP.UUID}]'
               delay: 15m
+              history: 90d
               units: uptime
               params: '(last(//xoa.backup.vm.end[{#BACKUP.UUID}])-last(//xoa.backup.vm.start[{#BACKUP.UUID}]))'
               preprocessing:
@@ -710,6 +718,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.backup.vm.end[{#BACKUP.UUID}]'
               delay: '0'
+              history: 90d
               value_type: FLOAT
               units: unixtime
               preprocessing:
@@ -734,6 +743,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.backup.vm.name[{#BACKUP.UUID}]'
               delay: '0'
+              history: 90d
               value_type: TEXT
               trends: '0'
               preprocessing:
@@ -801,7 +811,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 506;
                 }
-              timeout: 60s
+              timeout: 120s
               parameters:
                 - name: proxy
                   value: '{$XOA.PROXY.URL}'
@@ -821,6 +831,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.backup.vm.start[{#BACKUP.UUID}]'
               delay: '0'
+              history: 90d
               units: unixtime
               preprocessing:
                 - type: JSONPATH
@@ -844,6 +855,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.backup.vm.status[{#BACKUP.UUID}]'
               delay: '0'
+              history: 90d
               value_type: TEXT
               trends: '0'
               preprocessing:
@@ -868,6 +880,7 @@ zabbix_export:
                   tags:
                     - tag: scope
                       value: vm
+          timeout: 3s
           parameters:
             - name: proxy
               value: '{$XOA.PROXY.URL}'
@@ -940,6 +953,7 @@ zabbix_export:
                   value: Hypervisors
                 - tag: target
                   value: XCP-NG
+          timeout: 3s
           parameters:
             - name: proxy
               value: '{$XOA.PROXY.URL}'
@@ -997,6 +1011,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.pool.cpu.cores[{#POOL.URL}]'
               delay: '0'
+              history: 90d
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1013,6 +1028,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.pool.cpu.sockets[{#POOL.URL}]'
               delay: '0'
+              history: 90d
               preprocessing:
                 - type: JSONPATH
                   parameters:
@@ -1029,6 +1045,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.pool.description[{#POOL.URL}]'
               delay: '0'
+              history: 90d
               value_type: CHAR
               trends: '0'
               preprocessing:
@@ -1050,6 +1067,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.pool.ha.enabled[{#POOL.URL}]'
               delay: '0'
+              history: 90d
               value_type: CHAR
               trends: '0'
               preprocessing:
@@ -1068,6 +1086,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.pool.name[{#POOL.URL}]'
               delay: '0'
+              history: 90d
               value_type: CHAR
               trends: '0'
               preprocessing:
@@ -1092,6 +1111,7 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               trends: '0'
+              timeout: 3s
               url: '{$XOA.URL}{#POOL.URL}'
               headers:
                 - name: Cookie
@@ -1101,6 +1121,7 @@ zabbix_export:
               tags:
                 - tag: component
                   value: raw
+          timeout: 3s
           parameters:
             - name: proxy
               value: '{$XOA.PROXY.URL}'
@@ -1164,6 +1185,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.sr.maintenance[{#SR.URL}]'
               delay: '0'
+              history: 90d
               value_type: CHAR
               trends: '0'
               preprocessing:
@@ -1182,6 +1204,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.sr.name[{#SR.URL}]'
               delay: '0'
+              history: 90d
               value_type: CHAR
               trends: '0'
               preprocessing:
@@ -1206,6 +1229,7 @@ zabbix_export:
               history: '0'
               value_type: TEXT
               trends: '0'
+              timeout: 3s
               url: '{$XOA.URL}{#SR.URL}'
               headers:
                 - name: Cookie
@@ -1220,6 +1244,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.sr.size[{#SR.URL}]'
               delay: '0'
+              history: 90d
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -1237,6 +1262,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.sr.type.content[{#SR.URL}]'
               delay: '0'
+              history: 90d
               value_type: CHAR
               trends: '0'
               preprocessing:
@@ -1258,6 +1284,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.sr.type[{#SR.URL}]'
               delay: '0'
+              history: 90d
               value_type: CHAR
               trends: '0'
               preprocessing:
@@ -1279,6 +1306,7 @@ zabbix_export:
               type: CALCULATED
               key: 'xoa.sr.used.percentage[{#SR.URL}]'
               delay: 5m
+              history: 90d
               value_type: FLOAT
               units: '%'
               params: 'last(//xoa.sr.used.physical[{#SR.URL}])/last(//xoa.sr.size[{#SR.URL}])*100'
@@ -1310,6 +1338,7 @@ zabbix_export:
               type: DEPENDENT
               key: 'xoa.sr.used.physical[{#SR.URL}]'
               delay: '0'
+              history: 90d
               units: B
               preprocessing:
                 - type: JSONPATH
@@ -1322,6 +1351,7 @@ zabbix_export:
                   value: storage
                 - tag: repository
                   value: '{#SR.NAME}'
+          timeout: 3s
           parameters:
             - name: proxy
               value: '{$XOA.PROXY.URL}'
@@ -1394,6 +1424,7 @@ zabbix_export:
                   value: hypervisor
                 - tag: target
                   value: guest
+          timeout: 3s
           parameters:
             - name: proxy
               value: '{$XOA.PROXY.URL}'

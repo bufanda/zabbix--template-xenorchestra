@@ -280,6 +280,10 @@ zabbix_export:
             - type: JSONPATH
               parameters:
                 - $.startTime
+            - type: STR_REPLACE
+              parameters:
+                - 'null'
+                - '0'
             - type: DISCARD_UNCHANGED_HEARTBEAT
               parameters:
                 - 1h
