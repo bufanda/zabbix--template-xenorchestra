@@ -452,7 +452,7 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 90dd8a29cfc3457aabb35ce8527683d4
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false"'
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false" and {XCP-NG VM via Xen Orchestra:host.iregexp("^\[Importing")}=0'
               name: 'No management agent install on VM'
               priority: INFO
               manual_close: 'YES'
@@ -553,7 +553,7 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 4f938791d96b4898860edf870a1bc72e
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#2)'
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#2) and {XCP-NG VM via Xen Orchestra:host.iregexp("^\[Importing")}=0'
               recovery_mode: NONE
               name: 'State of VM changed'
               priority: AVERAGE
