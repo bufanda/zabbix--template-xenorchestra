@@ -452,7 +452,7 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 90dd8a29cfc3457aabb35ce8527683d4
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false" and {XCP-NG VM via Xen Orchestra:host.iregexp("^VM-\[Importing")}=0'
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false"'
               name: 'No management agent install on VM'
               priority: INFO
               manual_close: 'YES'
@@ -553,7 +553,7 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 4f938791d96b4898860edf870a1bc72e
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#2) and {XCP-NG VM via Xen Orchestra:host.iregexp("^VM-\[Importing")}=0'
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#2)'
               recovery_mode: NONE
               name: 'State of VM changed'
               priority: AVERAGE
@@ -930,6 +930,12 @@ zabbix_export:
                 }
             }
             return JSON.stringify(retVal);
+          filter:
+            conditions:
+              - macro: '{#VM.NAME}'
+                value: '{$XEN.VM.IGNORE}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
           lifetime: 1d
           enabled_lifetime_type: DISABLE_NEVER
           host_prototypes:
@@ -1463,8 +1469,11 @@ zabbix_export:
         - macro: '{$XEN.SR.IGNORE}'
           value: '^(DVD drives|XCP-ng Tools|Removable storage)$'
           description: 'Do not discover following SRs'
+        - macro: '{$XEN.VM.IGNORE}'
+          value: '^(Importing).*$'
+          description: 'Do not discover VMs containing Strings included in this regexp'
         - macro: '{$XOA.AUTH.TOKEN}'
-          value: CHANGE_IF_NEEDED
+          value: ADD_TOKEN_HERE
           description: 'Authentication Token generated on XOA UI'
         - macro: '{$XOA.BACKUP.NOT_MATCHES}'
           value: CHANGE_IF_NEEDED
