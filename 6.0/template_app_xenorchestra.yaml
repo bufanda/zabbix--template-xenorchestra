@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2024-11-27T20:05:57Z'
+  date: '2025-03-10T08:45:10Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -427,7 +427,7 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 90dd8a29cfc3457aabb35ce8527683d4
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false" and {XCP-NG VM via Xen Orchestra:host.iregexp("^VM-\[Importing")}=0'
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false"'
               name: 'No management agent install on VM'
               priority: INFO
               manual_close: 'YES'
@@ -522,7 +522,7 @@ zabbix_export:
             key: xoa.vms.raw
           triggers:
             - uuid: 4f938791d96b4898860edf870a1bc72e
-              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#2) and {XCP-NG VM via Xen Orchestra:host.iregexp("^VM-\[Importing")}=0'
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state)<>last(/XCP-NG VM via Xen Orchestra/xoa.vm.power.state,#2)'
               recovery_mode: NONE
               name: 'State of VM changed'
               priority: AVERAGE
@@ -711,6 +711,9 @@ zabbix_export:
                 - type: JSONPATH
                   parameters:
                     - $.name
+                - type: DISCARD_UNCHANGED_HEARTBEAT
+                  parameters:
+                    - 1h
               master_item:
                 key: 'xoa.backup.vm.raw[{#BACKUP.UUID}]'
               tags:
@@ -1267,12 +1270,12 @@ zabbix_export:
                   expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.WARN}'
                   name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is low'
                   priority: WARNING
-                  dependencies:
-                    - name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is critical low'
-                      expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
                   tags:
                     - tag: scope
                       value: storage
+                  dependencies:
+                    - name: 'Free space on SR {#SR.NAME} ({#SR.UUID}) is critical low'
+                      expression: 'last(/Xen Orchestra by HTTP/xoa.sr.used.percentage[{#SR.URL}])>{$XOA.SR.THRESHOLD.CRIT}'
             - uuid: 57b22801aba547bfa90a3304a59f53dc
               name: 'SR {#SR.NAME} ({#SR.UUID}): Physical Usage'
               type: DEPENDENT
@@ -1339,6 +1342,12 @@ zabbix_export:
                 }
             }
             return JSON.stringify(retVal);
+          filter:
+            conditions:
+              - macro: '{#VM.NAME}'
+                value: '{$XOA.VM.IGNORE}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
           lifetime: 1d
           host_prototypes:
             - uuid: 78bf8b747c7547f2990fcf9f4bac56ae
@@ -1417,6 +1426,9 @@ zabbix_export:
         - macro: '{$XOA.URL}'
           value: CHANGE
           description: 'URL where XOA can be reached'
+        - macro: '{$XOA.VM.IGNORE}'
+          value: '^.*(IMPORTING).*$'
+          description: 'Ignore VMs containing sting'
       valuemaps:
         - uuid: 0ec95555cba645f796a21bdece34349c
           name: 'XOA Boolean'
