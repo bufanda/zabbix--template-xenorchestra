@@ -836,7 +836,7 @@ zabbix_export:
                   value: vm
               trigger_prototypes:
                 - uuid: b7a1d34be70b45688df8d48d018d06eb
-                  expression: 'last(/Xen Orchestra by HTTP/xoa.backup.vm.status[{#BACKUP.UUID}])="failed"'
+                  expression: 'last(/Xen Orchestra by HTTP/xoa.backup.vm.status[{#BACKUP.UUID}])="failed" or last(/Xen Orchestra by HTTP/xoa.backup.vm.status[{#BACKUP.UUID}])="failure"'
                   name: 'VM Backup {#BACKUP.NAME} has bad status'
                   priority: AVERAGE
                   tags:
