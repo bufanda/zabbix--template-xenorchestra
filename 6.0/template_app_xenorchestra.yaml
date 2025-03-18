@@ -117,7 +117,7 @@ zabbix_export:
         - uuid: ecf042cea23e45e89954fe6fc499be86
           name: 'HVM capable'
           type: DEPENDENT
-          key: xoa.host.hvm.capabale
+          key: xoa.host.hvm.capable
           delay: '0'
           trends: '0'
           value_type: CHAR
@@ -640,7 +640,7 @@ zabbix_export:
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/backup/jobs/vm'));
             } catch (error) {
-                Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/backup/jobs/vm Error: " + error);
+                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/backup/jobs/vm Error: " + error);
                 if (!Number.isInteger(error)) {
                     return 520;
                 }
@@ -872,7 +872,7 @@ zabbix_export:
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/hosts'));
             } catch (error) {
-                Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/hosts Error: " + error);
+                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/hosts Error: " + error);
                 if (!Number.isInteger(error)) {
                     return 520;
                 }
@@ -884,7 +884,7 @@ zabbix_export:
                     hostInfo = JSON.parse(resp);
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": hostInfo.uuid, 'name': hostInfo.name_label });
                 } catch (error) {
-                    Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/hosts Error: " + error);
+                    Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/hosts Error: " + error);
                     if (!Number.isInteger(error)) {
                         return 520;
                     }
@@ -909,7 +909,7 @@ zabbix_export:
                 - macro: '{$XOA.HOST.UUID}'
                   value: '{#HOSTS.UUID}'
               tags:
-                - tag: componenet
+                - tag: component
                   value: Hypervisors
                 - tag: target
                   value: XCP-NG
@@ -943,7 +943,7 @@ zabbix_export:
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/pools'));
             } catch (error) {
-                Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/pools Error: " + error);
+                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/pools Error: " + error);
                 if (!Number.isInteger(error)) {
                     return 520;
                 }
@@ -955,7 +955,7 @@ zabbix_export:
                     poolInfo = JSON.parse(resp);
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": poolInfo.uuid, 'name': poolInfo.name_label });
                 } catch (error) {
-                    Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/pools Error: " + error);
+                    Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/pools Error: " + error);
                     if (!Number.isInteger(error)) {
                         return 520;
                     }
@@ -997,7 +997,7 @@ zabbix_export:
                 - tag: pool
                   value: '{#POOL.NAME}'
             - uuid: 46a2c37e887a44af831a95b2962ee8c4
-              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Descriptipn'
+              name: 'Pool {#POOL.NAME} ({#POOL.UUID}): Description'
               type: DEPENDENT
               key: 'xoa.pool.description[{#POOL.URL}]'
               delay: '0'
@@ -1103,7 +1103,7 @@ zabbix_export:
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/srs'));
             } catch (error) {
-                Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/srs Error: " + error);
+                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/srs Error: " + error);
                 if (!Number.isInteger(error)) {
                     return 520;
                 }
@@ -1115,7 +1115,7 @@ zabbix_export:
                     srInfo = JSON.parse(resp);
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": srInfo.uuid, 'name': srInfo.name_label });
                 } catch (error) {
-                    Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/srs Error: " + error);
+                    Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/srs Error: " + error);
                     if (!Number.isInteger(error)) {
                         return 520;
                     }
@@ -1323,7 +1323,7 @@ zabbix_export:
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
                 var response = req.get(encodeURI(server_url + '/rest/v0/vms'));
             } catch (error) {
-                Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/vms Error: " + error);
+                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/vms Error: " + error);
                 if (!Number.isInteger(error)) {
                     return 520;
                 }
@@ -1335,7 +1335,7 @@ zabbix_export:
                     vmsInfo = JSON.parse(resp);
                     retVal.push({ "url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label });
                 } catch (error) {
-                    Zabbix.log(3, "XenOrchestra API failes" + server_url + "/rest/v0/vms Error: " + error);
+                    Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/vms Error: " + error);
                     if (!Number.isInteger(error)) {
                         return 520;
                     }
@@ -1427,7 +1427,7 @@ zabbix_export:
           value: CHANGE
           description: 'URL where XOA can be reached'
         - macro: '{$XOA.VM.IGNORE}'
-          value: '^.*(IMPORTING).*$'
+          value: '.*\[Importing.*'
           description: 'Ignore VMs containing sting'
       valuemaps:
         - uuid: 0ec95555cba645f796a21bdece34349c
