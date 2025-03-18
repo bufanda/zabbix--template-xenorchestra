@@ -1341,7 +1341,7 @@ zabbix_export:
             return JSON.stringify(retVal);
           filter:
             conditions:
-              - macro: '{#VM.NAME}'
+              - macro: '{#VMS.NAME}'
                 value: '{$XEN.VM.IGNORE}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
