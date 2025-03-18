@@ -785,7 +785,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-
+                
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));
@@ -930,12 +930,6 @@ zabbix_export:
                 }
             }
             return JSON.stringify(retVal);
-          filter:
-            conditions:
-              - macro: '{#VM.NAME}'
-                value: '{$XEN.VM.IGNORE}'
-                operator: NOT_MATCHES_REGEX
-                formulaid: A
           lifetime: 1d
           enabled_lifetime_type: DISABLE_NEVER
           host_prototypes:
@@ -1407,6 +1401,11 @@ zabbix_export:
                 }
             }
             return JSON.stringify(retVal);
+          filter:
+            conditions:
+              - macro: '{#VMS.NAME}'
+                value: '{$XOA.VM.IGNORE}'
+                formulaid: A
           lifetime: 1d
           enabled_lifetime_type: DISABLE_NEVER
           host_prototypes:
