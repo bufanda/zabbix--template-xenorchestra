@@ -14,7 +14,7 @@ Zabbix version: 6.0 and higher.
 ## Tested versions
 
 This template has been tested on:
-- XenOrchestra CE (from sources)
+- XenOrchestra 5 CE (from sources)
 - Zabbix 6.0
 - Zabbix 6.4
 - Zabbix 7.0
