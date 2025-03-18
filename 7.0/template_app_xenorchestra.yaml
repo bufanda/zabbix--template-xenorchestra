@@ -1470,7 +1470,7 @@ zabbix_export:
           value: '^(DVD drives|XCP-ng Tools|Removable storage)$'
           description: 'Do not discover following SRs'
         - macro: '{$XEN.VM.IGNORE}'
-          value: '^(Importing).*$'
+          value: '.*\[Importing.*'
           description: 'Do not discover VMs containing Strings included in this regexp'
         - macro: '{$XOA.AUTH.TOKEN}'
           value: ADD_TOKEN_HERE
