@@ -1324,6 +1324,8 @@ zabbix_export:
             conditions:
               - macro: '{#VMS.NAME}'
                 value: '{$XOA.VM.IGNORE}'
+                operator: NOT_MATCHES_REGEX
+                formulaid: A
           lifetime: 1d
           enabled_lifetime_type: DISABLE_NEVER
           host_prototypes:
@@ -1386,7 +1388,7 @@ zabbix_export:
         - macro: '{$XEN.SR.IGNORE}'
           value: '^(DVD drives|XCP-ng Tools|Removable storage)$'
           description: 'Do not discover following SRs'
-        - macro: '{$XEN.VM.IGNORE}'
+        - macro: '{$XOA.VM.IGNORE}'
           value: '.*\[Importing.*'
           description: 'Do not discover VMs containing Strings included in this regexp'
         - macro: '{$XOA.AUTH.TOKEN}'

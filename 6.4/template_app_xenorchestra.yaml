@@ -1342,7 +1342,7 @@ zabbix_export:
           filter:
             conditions:
               - macro: '{#VMS.NAME}'
-                value: '{$XEN.VM.IGNORE}'
+                value: '{$XOA.VM.IGNORE}'
                 operator: NOT_MATCHES_REGEX
                 formulaid: A
           lifetime: 1d
@@ -1405,7 +1405,7 @@ zabbix_export:
         - macro: '{$XEN.SR.IGNORE}'
           value: '^(DVD drives|XCP-ng Tools|Removable storage)$'
           description: 'Do not discover following SRs'
-        - macro: '{$XEN.VM.IGNORE}'
+        - macro: '{$XOA.VM.IGNORE}'
           value: '.*\[Importing.*'
           description: 'Do not discover VMs containing Strings included in this regexp'
         - macro: '{$XOA.AUTH.TOKEN}'
