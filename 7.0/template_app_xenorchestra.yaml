@@ -1477,7 +1477,7 @@ zabbix_export:
           steps:
             - name: 'Check Token Validity'
               url: '{$XOA.URL}/rest/v0'
-              follow_redirects: 'NO'
+              follow_redirects: 'YES'
               status_codes: '200'
       tags:
         - tag: component
