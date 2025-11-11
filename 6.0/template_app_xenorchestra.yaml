@@ -623,6 +623,25 @@ zabbix_export:
       name: 'Xen Orchestra by HTTP'
       groups:
         - name: Templates
+      items:
+        - uuid: 7142b4ff9e2a454989ac2457d9b75ff3
+          name: 'Check XenOrchestra API availability'
+          type: SIMPLE
+          key: 'net.tcp.service["http{{$XOA.URL}.iregsub(\"^http(.):\/\/\",\1)}","{{$XOA.URL}.iregsub(\":\/\/([^:]+)\",\1)}","{{$XOA.URL}.iregsub(\":\/\/[^:]+:([0-9]+)\",\1)}"]'
+          delay: 5m
+          valuemap:
+            name: 'XOA Port availability'
+          tags:
+            - tag: component
+              value: network
+          triggers:
+            - uuid: 800be5a22d0f4d6c813338a839effade
+              expression: 'last(/Xen Orchestra by HTTP/net.tcp.service["http{{$XOA.URL}.iregsub(\"^http(.):\/\/\",\1)}","{{$XOA.URL}.iregsub(\":\/\/([^:]+)\",\1)}","{{$XOA.URL}.iregsub(\":\/\/[^:]+:([0-9]+)\",\1)}"])=0'
+              name: 'XenOrchestra API is unavailable'
+              priority: WARNING
+              tags:
+                - tag: target
+                  value: 'xoa api'
       discovery_rules:
         - uuid: 4f543445aeb1465ebb10fe09d895c661
           name: 'Discovery Backups VM'
@@ -749,7 +768,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-                
+
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));
@@ -1437,6 +1456,13 @@ zabbix_export:
               newvalue: 'true'
             - value: '0'
               newvalue: 'false'
+        - uuid: 0196b186bcdf44ff8c56197f03fd7a83
+          name: 'XOA Port availability'
+          mappings:
+            - value: '0'
+              newvalue: down
+            - value: '1'
+              newvalue: up              
   triggers:
     - uuid: 728078ed899548faa3736110abb9d69e
       expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=401'
@@ -1444,3 +1470,24 @@ zabbix_export:
       recovery_expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=200'
       name: 'Authentication Token for XenOrchestra is invalid'
       priority: HIGH
+      tags:
+        - tag: target
+          value: authorization
+    - uuid: f8aac01765c34373af70b7a0bc8aeb74
+      expression: 'length(last(/Xen Orchestra by HTTP/web.test.error[Check Token Validity]))>0 and last(/Xen Orchestra by HTTP/web.test.fail[Check Token Validity])>0'
+      name: 'XenOrchestra API error occured: {ITEM.VALUE}'
+      priority: HIGH
+      dependencies:
+        - name: 'Authentication Token for XenOrchestra is invalid'
+          expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=401'
+          recovery_expression: 'last(/Xen Orchestra by HTTP/web.test.rspcode[Check Token Validity,Check Token Validity])=200'
+      tags:
+        - tag: target
+          value: availability
+    - uuid: a712319ead444d38acef78639c6cebd4
+      expression: 'last(/Xen Orchestra by HTTP/web.test.time[Check Token Validity,Check Token Validity,resp])>={$XOA.RESPONSE.TIME.SLOW}'
+      name: 'XenOrchestra API is slow. Response time > {$XOA.RESPONSE.TIME.SLOW}s'
+      priority: WARNING
+      tags:
+        - tag: target
+          value: performance
