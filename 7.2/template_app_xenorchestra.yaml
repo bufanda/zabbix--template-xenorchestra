@@ -281,6 +281,20 @@ zabbix_export:
                 - 1h
           master_item:
             key: xoa.host.raw
+        - uuid: 5e1c4c147f4d468eb7002c335ce83357
+          name: 'XCP-NG HOSTS: Get Stats'
+          type: HTTP_AGENT
+          key: xoa.host.stats.raw
+          delay: 5m
+          history: '0'
+          value_type: TEXT
+          timeout: 30s
+          url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}/stats'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
         - uuid: dab4f3b69f5141048e914d87ed23dd69
           name: 'Number of Missing Patches'
           type: DEPENDENT
@@ -297,6 +311,48 @@ zabbix_export:
               expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.hosts.missingpatches.count)>{$XOA.HOST.MISSING.PATCHES.MAX}'
               name: 'Number of {$XOA.HOST.MISSING.PATCHES.MAX} missing patches exceeded'
               priority: WARNING
+      discovery_rules:
+        - uuid: a677aa05843c4b9aa336d8163e3202d6
+          name: 'CPU usage per core discovery'
+          type: DEPENDENT
+          key: xoa.host.stats.cpu.discovery
+          lifetime: 1d
+          item_prototypes:
+            - uuid: dbedb6c005e64c2297763b9494b4db70
+              name: 'CPU Core {#CORE} usage'
+              type: DEPENDENT
+              key: 'xoa.host.stats.cpu.usage[{#CORE}]'
+              units: '%'
+              preprocessing:
+                - type: JSONPATH
+                  parameters:
+                    - '$.stats.cpus.{#CORE}.[0]'
+              master_item:
+                key: xoa.host.stats.raw
+          master_item:
+            key: xoa.host.stats.raw
+          lld_macro_paths:
+            - lld_macro: '{#CORE}'
+              path: $.core
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - $.stats
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  var stats = JSON.parse(value)
+                  var cpu_list = stats.cpus
+                  var count = 0
+                  var output = []
+                  for (var cpu in cpu_list){
+                    if (cpu_list.hasOwnProperty(cpu)){
+                      output.push({'core': count})
+                      count++
+                    }
+                  }
+                  
+                  return JSON.stringify(output)
       tags:
         - tag: component
           value: hypervisor
@@ -414,6 +470,9 @@ zabbix_export:
                 - $.managementAgentDetected
           master_item:
             key: xoa.vms.raw
+          tags:
+            - tag: component
+              value: agent
           triggers:
             - uuid: 90dd8a29cfc3457aabb35ce8527683d4
               expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.management.agent)="false"'
@@ -432,6 +491,11 @@ zabbix_export:
                 - $.memory.size
           master_item:
             key: xoa.vms.raw
+          tags:
+            - tag: component
+              value: stats
+            - tag: target
+              value: memory
         - uuid: c319917b771c46afbf2fdacf217216d1
           name: 'Virtualization mode'
           type: DEPENDENT
@@ -545,6 +609,40 @@ zabbix_export:
                 - 1h
           master_item:
             key: xoa.vms.raw
+        - uuid: 23912f95c51c408d93df365b8ed34af6
+          name: 'CPU usage'
+          type: DEPENDENT
+          key: xoa.vm.stats.cpu
+          history: 90d
+          units: '%'
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.stats.cpuUsage.[0]'
+          master_item:
+            key: xoa.vms.stats.raw
+          tags:
+            - tag: component
+              value: stats
+            - tag: target
+              value: cpu
+        - uuid: e68694d77df24850964b6c3b10c7f6ec
+          name: 'Memory Free'
+          type: DEPENDENT
+          key: xoa.vm.stats.memory.free
+          history: 90d
+          units: B
+          preprocessing:
+            - type: JSONPATH
+              parameters:
+                - '$.stats.memoryFree.[0]'
+          master_item:
+            key: xoa.vms.stats.raw
+          tags:
+            - tag: component
+              value: stats
+            - tag: target
+              value: memory
         - uuid: cb8d4b3b8a0442c2aa48853c6ab45af3
           name: 'Xen Tool Version'
           type: DEPENDENT
@@ -569,6 +667,20 @@ zabbix_export:
           value_type: TEXT
           timeout: 30s
           url: '{$XOA.URL}/rest/v0/vms/{$XOA.VM.UUID}'
+          headers:
+            - name: Cookie
+              value: 'authenticationToken={$XOA.AUTH.TOKEN}'
+            - name: Accept
+              value: application/json
+        - uuid: aef9ff097d644603acad1a4f4bfd24e6
+          name: 'XCP-NG VMS: Get Stats'
+          type: HTTP_AGENT
+          key: xoa.vms.stats.raw
+          delay: 5m
+          history: '0'
+          value_type: TEXT
+          timeout: 30s
+          url: '{$XOA.URL}/rest/v0/vms/{$XOA.VM.UUID}/stats'
           headers:
             - name: Cookie
               value: 'authenticationToken={$XOA.AUTH.TOKEN}'
@@ -1395,7 +1507,6 @@ zabbix_export:
           steps:
             - name: 'Check Token Validity'
               url: '{$XOA.URL}/rest/v0'
-              follow_redirects: 'YES'
               status_codes: '200'
       tags:
         - tag: component
