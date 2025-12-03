@@ -343,14 +343,14 @@ zabbix_export:
         - uuid: a677aa05843c4b9aa336d8163e3202d6
           name: 'CPU usage per core discovery'
           type: DEPENDENT
-          key: xoa.hosts.stats.cpu.discovery
+          key: xoa.host.stats.cpu.discovery
           delay: '0'
           lifetime: 1d
           item_prototypes:
             - uuid: dbedb6c005e64c2297763b9494b4db70
               name: 'CPU Core {#CORE} usage'
               type: DEPENDENT
-              key: 'xoa.hosts.stats.cpu.usage[{#CORE}]'
+              key: 'xoa.host.stats.cpu.usage[{#CORE}]'
               delay: '0'
               units: '%'
               preprocessing:
