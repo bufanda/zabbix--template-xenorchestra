@@ -361,16 +361,16 @@ zabbix_export:
                 key: xoa.host.stats.raw
               trigger_prototypes:
                 - uuid: 8d5e3654f4ef471a92b6ed4f5cb63538
-                  expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
-                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}%'
+                  expression: 'max(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}],10m)>{$CPU.USAGE.CRIT}'
+                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}% for more than 10 minutes'
                   priority: HIGH
                 - uuid: 6d4c3a9b6f1846358d543d119d72f066
-                  expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.WARN}'
-                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.WARN}%'
+                  expression: 'max(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}],10m)>{$CPU.USAGE.WARN}'
+                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.WARN}% for more than 10 minutes'
                   priority: WARNING
                   dependencies:
-                    - name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}%'
-                      expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
+                    - name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}% for more than 10 minutes'
+                      expression: 'max(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}],10m)>{$CPU.USAGE.CRIT}'
           master_item:
             key: xoa.host.stats.raw
           lld_macro_paths:
@@ -393,7 +393,7 @@ zabbix_export:
                       count++
                     }
                   }
-
+                  
                   return JSON.stringify(output)
       tags:
         - tag: component
@@ -958,7 +958,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-
+                
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));
