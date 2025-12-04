@@ -343,14 +343,14 @@ zabbix_export:
               trigger_prototypes:
                 - uuid: 8d5e3654f4ef471a92b6ed4f5cb63538
                   expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
-                  name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:CRIT}%'
+                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}%'
                   priority: HIGH
                 - uuid: 6d4c3a9b6f1846358d543d119d72f066
                   expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.WARN}'
-                  name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:WARN}%'
+                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.WARN}%'
                   priority: WARNING
                   dependencies:
-                    - name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:CRIT}%'
+                    - name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}%'
                       expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
           master_item:
             key: xoa.host.stats.raw
