@@ -359,6 +359,18 @@ zabbix_export:
                     - '$.stats.cpus.{#CORE}.[0]'
               master_item:
                 key: xoa.host.stats.raw
+              trigger_prototypes:
+                - uuid: 8d5e3654f4ef471a92b6ed4f5cb63538
+                  expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
+                  name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:CRIT}%'
+                  priority: HIGH
+                - uuid: 6d4c3a9b6f1846358d543d119d72f066
+                  expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.WARN}'
+                  name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:WARN}%'
+                  priority: WARNING
+                  dependencies:
+                    - name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:CRIT}%'
+                      expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
           master_item:
             key: xoa.host.stats.raw
           lld_macro_paths:
@@ -389,6 +401,12 @@ zabbix_export:
         - tag: target
           value: xcp-ng
       macros:
+        - macro: '{$CPU.USAGE.CRIT}'
+          value: '90'
+          description: 'High serverity trigger when CPU usage exceeds this value'
+        - macro: '{$CPU.USAGE.WARN}'
+          value: '80'
+          description: 'Warning when CPU usage exceeds this value'
         - macro: '{$XOA.AUTH.TOKEN}'
           value: CHANGE_IF_NEEDED
           description: 'Authentication Token generated on XOA UI'
@@ -679,6 +697,18 @@ zabbix_export:
               value: stats
             - tag: target
               value: cpu
+          triggers:
+            - uuid: a35c8d5dd00f4cf4b70b30d01b9cfdd0
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.stats.cpu)>{$CPU.USAGE.CRIT}'
+              name: 'CPU usage exceeds {$CPU.USAGE.CRIT}%'
+              priority: HIGH
+            - uuid: caac759e66cb42bbb33aa9ec55300420
+              expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.stats.cpu)>{$CPU.USAGE.WARN}'
+              name: 'CPU usage exceeds {$CPU.USAGE.WARN}%'
+              priority: WARNING
+              dependencies:
+                - name: 'CPU usage exceeds {$CPU.USAGE.CRIT}%'
+                  expression: 'last(/XCP-NG VM via Xen Orchestra/xoa.vm.stats.cpu)>{$CPU.USAGE.CRIT}'
         - uuid: e68694d77df24850964b6c3b10c7f6ec
           name: 'Memory Free'
           type: DEPENDENT
@@ -750,6 +780,12 @@ zabbix_export:
         - tag: target
           value: guests
       macros:
+        - macro: '{$CPU.USAGE.CRIT}'
+          value: '90'
+          description: 'High trigger when CPU usage exceeds this value'
+        - macro: '{$CPU.USAGE.WARN}'
+          value: '80'
+          description: 'Warning when CPU usage exceeds this value'
         - macro: '{$XOA.AUTH.TOKEN}'
           value: CHANGE_IF_NEEDED
           description: 'Authentication Token generated on XOA UI'
@@ -1595,7 +1631,6 @@ zabbix_export:
           steps:
             - name: 'Check Token Validity'
               url: '{$XOA.URL}/rest/v0'
-              follow_redirects: 'YES'
               status_codes: '200'
       tags:
         - tag: component
