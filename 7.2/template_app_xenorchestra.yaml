@@ -326,7 +326,7 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.stats.cpus.{#CORE}.[0]'
+                    - '$.stats.cpus.{#CORE}.[118]'
               master_item:
                 key: xoa.host.stats.raw
               trigger_prototypes:
@@ -636,7 +636,7 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.stats.cpuUsage.[0]'
+                - '$.stats.cpuUsage.[118]'
           master_item:
             key: xoa.vms.stats.raw
           tags:
@@ -788,9 +788,9 @@ zabbix_export:
                 }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
-                var response = req.get(encodeURI(server_url + '/rest/v0/backup/jobs/vm'));
+                var response = req.get(encodeURI(server_url + '/rest/v0/backup-jobs'));
             } catch (error) {
-                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/backup/jobs/vm Error: " + error);
+                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/backup-jobs Error: " + error);
                 if (!Number.isInteger(error)) {
                     return 520;
                 }
@@ -881,9 +881,9 @@ zabbix_export:
                     var req = new HttpRequest();
                     req.addHeader("Cookie: authenticationToken=" + params.token);
                     var server_url = params.url.endsWith("/") ? params.url.slice(0, -1) : params.url;
-                    var response = req.get(encodeURI(server_url + "/rest/v0/backup/logs?filter=jobId:" + params.uuid));
+                    var response = req.get(encodeURI(server_url + "/rest/v0/backup-logs?filter=jobId:" + params.uuid));
                     if (!response) {
-                        Zabbix.log(3, "XenOrchestra API Error: Empty response for URL " + server_url + "/rest/v0/backup/logs?filter=jobId:" + params.uuid);
+                        Zabbix.log(3, "XenOrchestra API Error: Empty response for URL " + server_url + "/rest/v0/backup-logs?filter=jobId:" + params.uuid);
                         return 501;
                     }
                     var backupLogUrls = JSON.parse(response);
