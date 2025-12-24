@@ -404,7 +404,7 @@ zabbix_export:
                       count++
                     }
                   }
-                  
+
                   return JSON.stringify(output)
       tags:
         - tag: component
@@ -969,7 +969,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-                
+
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));

@@ -357,7 +357,7 @@ zabbix_export:
                       expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
                   tags:
                     - tag: target
-                      value: usage              
+                      value: usage
           master_item:
             key: xoa.host.stats.raw
           lld_macro_paths:
