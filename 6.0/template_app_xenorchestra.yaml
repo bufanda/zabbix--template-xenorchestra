@@ -1,6 +1,6 @@
 zabbix_export:
   version: '6.0'
-  date: '2025-03-18T12:44:05Z'
+  date: '2026-02-03T07:59:00Z'
   groups:
     - uuid: 1b837a3c078647049a0c00c61b4d57b5
       name: Hypervisors
@@ -295,8 +295,8 @@ zabbix_export:
           key: xoa.host.stats.raw
           delay: 5m
           history: '0'
-          value_type: TEXT
           trends: '0'
+          value_type: TEXT
           timeout: 30s
           url: '{$XOA.URL}/rest/v0/hosts/{$XOA.HOST.UUID}/stats'
           headers:
@@ -337,27 +337,21 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.stats.cpus.{#CORE}.[118]'
+                    - '$.stats.cpus.{#CORE}.[0]'
               master_item:
                 key: xoa.host.stats.raw
               trigger_prototypes:
                 - uuid: 8d5e3654f4ef471a92b6ed4f5cb63538
-                  expression: 'max(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}],10m)>{$CPU.USAGE.CRIT}'
-                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}% for more than 10 minutes'
+                  expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
+                  name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:CRIT}%'
                   priority: HIGH
-                  tags:
-                    - tag: target
-                      value: usage
                 - uuid: 6d4c3a9b6f1846358d543d119d72f066
-                  expression: 'max(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}],10m)>{$CPU.USAGE.WARN}'
-                  name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.WARN}% for more than 10 minutes'
+                  expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.WARN}'
+                  name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:WARN}%'
                   priority: WARNING
                   dependencies:
-                    - name: 'CPU {#CORE} usage exceeds {$CPU.USAGE.CRIT}%'
+                    - name: 'CPU {#CORE} usage exceeds {$CPU:USAGE:CRIT}%'
                       expression: 'last(/XCP-NG Host via Xen Orchestra/xoa.host.stats.cpu.usage[{#CORE}])>{$CPU.USAGE.CRIT}'
-                  tags:
-                    - tag: target
-                      value: usage
           master_item:
             key: xoa.host.stats.raw
           lld_macro_paths:
@@ -380,7 +374,7 @@ zabbix_export:
                       count++
                     }
                   }
-
+                  
                   return JSON.stringify(output)
       tags:
         - tag: component
@@ -649,12 +643,11 @@ zabbix_export:
           type: DEPENDENT
           key: xoa.vm.stats.cpu
           delay: '0'
-          history: 90d
           units: '%'
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.stats.cpuUsage.[118]'
+                - '$.stats.cpuUsage.[0]'
           master_item:
             key: xoa.vms.stats.raw
           tags:
@@ -679,7 +672,6 @@ zabbix_export:
           type: DEPENDENT
           key: xoa.vm.stats.memory.free
           delay: '0'
-          history: 90d
           units: B
           preprocessing:
             - type: JSONPATH
@@ -728,8 +720,8 @@ zabbix_export:
           key: xoa.vms.stats.raw
           delay: 5m
           history: '0'
-          value_type: TEXT
           trends: '0'
+          value_type: TEXT
           timeout: 30s
           url: '{$XOA.URL}/rest/v0/vms/{$XOA.VM.UUID}/stats'
           headers:
@@ -809,9 +801,9 @@ zabbix_export:
                 }
                 req.addHeader('Cookie: authenticationToken=' + params.token);
                 var server_url = params.url.endsWith('/') ? params.url.slice(0, -1) : params.url;
-                var response = req.get(encodeURI(server_url + '/rest/v0/backup-jobs'));
+                var response = req.get(encodeURI(server_url + '/rest/v0/backup/jobs/vm'));
             } catch (error) {
-                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/backup-jobs Error: " + error);
+                Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/backup/jobs/vm Error: " + error);
                 if (!Number.isInteger(error)) {
                     return 520;
                 }
@@ -906,9 +898,9 @@ zabbix_export:
                     var req = new HttpRequest();
                     req.addHeader("Cookie: authenticationToken=" + params.token);
                     var server_url = params.url.endsWith("/") ? params.url.slice(0, -1) : params.url;
-                    var response = req.get(encodeURI(server_url + "/rest/v0/backup-logs?filter=jobId:" + params.uuid));
+                    var response = req.get(encodeURI(server_url + "/rest/v0/backup/logs?filter=jobId:" + params.uuid));
                     if (!response) {
-                        Zabbix.log(3, "XenOrchestra API Error: Empty response for URL " + server_url + "/rest/v0/backup-logs?filter=jobId:" + params.uuid);
+                        Zabbix.log(3, "XenOrchestra API Error: Empty response for URL " + server_url + "/rest/v0/backup/logs?filter=jobId:" + params.uuid);
                         return 501;
                     }
                     var backupLogUrls = JSON.parse(response);
@@ -920,7 +912,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-
+                
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));
@@ -1504,9 +1496,15 @@ zabbix_export:
                 try {
                     resp = req.get(encodeURI(server_url + JSON.parse(response)[r]));
                     vmsInfo = JSON.parse(resp);
-                    retVal.push({ "url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label });
+            		poolInfo = JSON.parse(req.get(encodeURI(server_url + '/rest/v0/pools/' + vmsInfo.$poolId)));
+            		if (vmsInfo.$container != "") {
+            	      hostInfo = JSON.parse(req.get(encodeURI(server_url + '/rest/v0/hosts/' + vmsInfo.$container)));
+            		} else {
+            		  hostInfo = {'name_label': "NaN"}
+                    }
+                    retVal.push({ "url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label, 'pool': poolInfo.name_label, 'host': hostInfo.name_label });
                 } catch (error) {
-                    Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/vms Error: " + error);
+                    Zabbix.log(4, "XenOrchestra API fails" + server_url + "/rest/v0/vms Error: " + error);
                     if (!Number.isInteger(error)) {
                         return 520;
                     }
@@ -1527,6 +1525,9 @@ zabbix_export:
               group_links:
                 - group:
                     name: 'Virtual machines'
+              group_prototypes:
+                - name: 'XOA/Host/__{#VMS.HOST}__'
+                - name: 'XOA/Pool/__{#VMS.POOL}__'
               templates:
                 - name: 'XCP-NG VM via Xen Orchestra'
               macros:
@@ -1549,8 +1550,12 @@ zabbix_export:
             - name: url
               value: '{$XOA.URL}'
           lld_macro_paths:
+            - lld_macro: '{#VMS.HOST}'
+              path: $.host
             - lld_macro: '{#VMS.NAME}'
               path: $.name
+            - lld_macro: '{#VMS.POOL}'
+              path: $.pool
             - lld_macro: '{#VMS.URL}'
               path: $.url
             - lld_macro: '{#VMS.UUID}'
@@ -1568,7 +1573,6 @@ zabbix_export:
           steps:
             - name: 'Check Token Validity'
               url: '{$XOA.URL}/rest/v0'
-              follow_redirects: 'YES'
               status_codes: '200'
       tags:
         - tag: component
