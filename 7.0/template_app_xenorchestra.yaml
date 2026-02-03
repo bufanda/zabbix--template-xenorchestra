@@ -404,7 +404,7 @@ zabbix_export:
                       count++
                     }
                   }
-
+                  
                   return JSON.stringify(output)
       tags:
         - tag: component
@@ -969,7 +969,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-
+                
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));
@@ -1576,9 +1576,15 @@ zabbix_export:
                 try {
                     resp = req.get(encodeURI(server_url + JSON.parse(response)[r]));
                     vmsInfo = JSON.parse(resp);
-                    retVal.push({ "url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label });
+            		poolInfo = JSON.parse(req.get(encodeURI(server_url + '/rest/v0/pools/' + vmsInfo.$poolId)));
+            		if (vmsInfo.$container != "") {
+            	      hostInfo = JSON.parse(req.get(encodeURI(server_url + '/rest/v0/hosts/' + vmsInfo.$container)));
+            		} else {
+            		  hostInfo = {'name_label': "NaN"}
+                    }
+                    retVal.push({ "url": JSON.parse(response)[r], "uuid": vmsInfo.uuid, 'name': vmsInfo.name_label, 'pool': poolInfo.name_label, 'host': hostInfo.name_label });
                 } catch (error) {
-                    Zabbix.log(3, "XenOrchestra API fails" + server_url + "/rest/v0/vms Error: " + error);
+                    Zabbix.log(4, "XenOrchestra API fails" + server_url + "/rest/v0/vms Error: " + error);
                     if (!Number.isInteger(error)) {
                         return 520;
                     }
@@ -1600,6 +1606,9 @@ zabbix_export:
               group_links:
                 - group:
                     name: 'Virtual machines'
+              group_prototypes:
+                - name: 'XOA/Host/__{#VMS.HOST}__'
+                - name: 'XOA/Pool/__{#VMS.POOL}__'
               templates:
                 - name: 'XCP-NG VM via Xen Orchestra'
               macros:
@@ -1623,8 +1632,12 @@ zabbix_export:
             - name: url
               value: '{$XOA.URL}'
           lld_macro_paths:
+            - lld_macro: '{#VMS.HOST}'
+              path: $.host
             - lld_macro: '{#VMS.NAME}'
               path: $.name
+            - lld_macro: '{#VMS.POOL}'
+              path: $.pool
             - lld_macro: '{#VMS.URL}'
               path: $.url
             - lld_macro: '{#VMS.UUID}'
