@@ -17,7 +17,6 @@ This template has been tested on:
 - XenOrchestra 5 CE (from sources)
 - Zabbix 6.0
 - Zabbix 7.0
-- Zabbix 7.2
 
 ## Author
 
