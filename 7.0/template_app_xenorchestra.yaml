@@ -1687,7 +1687,7 @@ zabbix_export:
           value: CHANGE
           description: 'URL where XOA can be reached'
         - macro: '{$XOA.VM.IGNORE}'
-          value: '.*\[Importing.*'
+          value: '^(.*\[Importing.*|VM-Health Check - .*|.* - \([0-9]{8}T[0-9]{6}Z\))$'
           description: 'Do not discover VMs containing Strings included in this regexp'
       valuemaps:
         - uuid: 0ec95555cba645f796a21bdece34349c
