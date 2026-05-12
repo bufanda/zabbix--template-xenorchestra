@@ -337,7 +337,12 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.stats.cpus.{#CORE}.[0]'
+                    - '$.stats.cpus.{#CORE}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      input = JSON.parse(value)
+                      return (input[input.length-1])
               master_item:
                 key: xoa.host.stats.raw
               trigger_prototypes:
@@ -374,7 +379,7 @@ zabbix_export:
                       count++
                     }
                   }
-                  
+
                   return JSON.stringify(output)
       tags:
         - tag: component
@@ -647,7 +652,12 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.stats.cpuUsage.[0]'
+                - $.stats.cpuUsage
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  input = JSON.parse(value)
+                  return (input[input.length-1])
           master_item:
             key: xoa.vms.stats.raw
           tags:
@@ -676,7 +686,12 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.stats.memoryFree.[0]'
+                - '$.stats.memoryFree'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  input = JSON.parse(value)
+                  return (input[input.length-1])                    
           master_item:
             key: xoa.vms.stats.raw
           tags:
@@ -912,7 +927,7 @@ zabbix_export:
                     Zabbix.log(3, "XenOrchestra API Error: " + error);
                     return 503;
                 }
-                
+
                 try {
                     var logUrl = backupLogUrls[backupLogUrls.length - 1];
                     var resp = req.get(encodeURI(server_url + logUrl));

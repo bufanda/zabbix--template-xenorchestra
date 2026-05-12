@@ -356,7 +356,12 @@ zabbix_export:
               preprocessing:
                 - type: JSONPATH
                   parameters:
-                    - '$.stats.cpus.{#CORE}.[118]'
+                    - '$.stats.cpus.{#CORE}'
+                - type: JAVASCRIPT
+                  parameters:
+                    - |
+                      input = JSON.parse(value)
+                      return (input[input.length-1])                    
               master_item:
                 key: xoa.host.stats.raw
               tags:
@@ -700,7 +705,12 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.stats.cpuUsage.[118]'
+                - $.stats.cpuUsage
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  input = JSON.parse(value)
+                  return (input[input.length-1])
           master_item:
             key: xoa.vms.stats.raw
           tags:
@@ -730,7 +740,12 @@ zabbix_export:
           preprocessing:
             - type: JSONPATH
               parameters:
-                - '$.stats.memoryFree.[0]'
+                - '$.stats.memoryFree'
+            - type: JAVASCRIPT
+              parameters:
+                - |
+                  input = JSON.parse(value)
+                  return (input[input.length-1])                    
           master_item:
             key: xoa.vms.stats.raw
           tags:
